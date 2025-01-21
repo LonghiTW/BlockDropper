@@ -14,35 +14,139 @@
     font-size: large;
     background-color: beige;
   }
+
   #container {
     margin: 1rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    width: 120px;
+    width: 300px;
+  }
+
+  .row {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 10px;
   }
 
   #result {
     display: flex;
-    height: 300px;
-    justify-content: center;
-    align-items: center;
     flex-direction: column;
+    width: 100%;
+    align-items: center;
+  }
+
+  .block-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 5px;
+    width: 100%;
+    justify-content: space-between;
   }
 
   img {
     width: 50px;
+    margin-right: 10px;
+  }
+
+  #inputContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  #pickedList {
+    display: flex;
+    flex-direction: column;
+    margin-left: 10px;
+  }
+
+  #hexValue {
+    font-weight: bold;
+  }
+
+  #slidexValueContainer {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  #sliderContainer {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  /* 讓滑鼠懸停在 RGB 滑桿上時顯示 col-resize 游標 */
+  #xSlider, #ySlider, #zSlider {
+    cursor: col-resize;
+  }
+
+  label {
+    margin-top: 10px;
+  }
+
+  /* 顏色模式按鈕的樣式 */
+  #colorModeButtons button {
+    width: 30%;
+    padding: 10px;
+    margin: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f0f0f0;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+  }
+
+  #colorModeButtons button.active {
+    background-color: #4CAF50; /* 當前模式為綠色 */
+    color: white;
   }
 </style>
 
 <body>
   <div id="container">
-    <input type="color" id="input">
-    <div id="result">
-      hiaa
+    <!-- Hex 顯示區 -->
+    <div id="inputContainer" class="row">
+      <input type="color" id="input">
+      <div id="hexValue"></div>
     </div>
+    
+    <!-- 新增 RGB, HSL, HSV 按鈕 -->
+    <div id="colorModeButtons" class="row">
+      <button id="rgbButton">RGB</button>
+      <button id="hslButton">HSL</button>
+      <button id="hsvButton">HSV</button>
+    </div>
+	
+    <!-- 色彩滑桿 -->
+    <div id="sliderContainer">
+      <div id="slidexValueContainer" class="row">
+        <label for="xSlider">R:</label>
+        <input type="range" id="xSlider" min="0" max="255" value="0">
+        <input type="number" id="xValue" min="0" max="255" value="0">
+      </div>
+      <div id="slidexValueContainer" class="row">
+        <label for="ySlider">G:</label>
+        <input type="range" id="ySlider" min="0" max="255" value="0">
+        <input type="number" id="yValue" min="0" max="255" value="0">
+      </div>
+      <div id="slidexValueContainer" class="row">
+        <label for="zSlider">B:</label>
+        <input type="range" id="zSlider" min="0" max="255" value="0">
+        <input type="number" id="zValue" min="0" max="255" value="0">
+      </div>
+    </div>
+
+    <!-- 顯示匹配的顏色 -->
+    <div id="result"></div>
+    <div id="pickedList"></div>
   </div>
+
   <script type="module" src="popup.js"></script>
 </body>
 

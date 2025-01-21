@@ -4,22 +4,34 @@
 	"version": "1.0",
 	"description": "A web tool that can pick color to find the matching blocks.",
 	"permissions": ["activeTab", "scripting", "storage"],
-	"host_permissions": ["*://*/*"],
+	"host_permissions": ["<all_urls>"],
 	"action": {
 		"default_popup": "popup.html",
 		"default_icon": "color-picker.png"
 	},
 	"web_accessible_resources": [
 		{
-			"resources": ["/assest/blocks/*"],
-			"matches": ["*://*/*"]
+			"resources": [
+                "/block/*",
+                "blockColors.json"
+            ],
+			"matches": ["<all_urls>"]
 		}
 	],
+    "background": {
+        "service_worker": "background.js"
+    },
 	"content_scripts": [
 		{
-			"matches": ["*://*/*"],
+			"matches": ["<all_urls>"],
 			"css": ["/content/content.css"],
-			"js": ["/content/content.js"]
+			"js": ["/content/blocks.js", "/content/content.js"]
 		}
-	]
+	],
+	"commands": {
+		"pick-from-webpage": {
+			"suggested_key": {"default":"Alt+B"},
+			"description": "Pick color from web page"
+		}
+	}
 }
