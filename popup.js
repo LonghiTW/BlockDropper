@@ -1,14 +1,13 @@
-// 1. 讀取 blockColors.json 資料
+// 全域變數
 let blocks = [];
 let currentMode = 'rgb'; // 預設顏色模式為 RGB
 
-// 改用 async/await 載入檔案
+// 讀取 blockColors.json 資料
 async function loadBlockColors() {
     try {
         const response = await fetch(chrome.runtime.getURL('blockColors.json'));
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
         const data = await response.json();
         blocks = data.map(block => ({
             ...block,
@@ -42,13 +41,11 @@ modeButtons.forEach(button => {
         const mode = button.id.replace('Button', ''); // 從按鈕的 id 中提取顏色模式名稱
         updateColorMode(mode);  // 更新顏色模式
         updateColorModeButtonStyle(mode);  // 更新選中按鈕的樣式
-
-        // 儲存選擇的顏色模式
-        chrome.storage.local.set({ colorMode: mode });
+        chrome.storage.local.set({ colorMode: mode }); // 儲存選擇的顏色模式
     });
 });
 
-// 2. 創建顯示結果的元素
+// 創建顯示結果的元素
 const result = document.getElementById('result');
 const input = document.getElementById('input');
 const hexValue = document.getElementById('hexValue');
@@ -67,12 +64,7 @@ document.getElementById('hsvButton').addEventListener('click', () => updateColor
 function hexToRGB(hex) {
     if (!hex) return null;
     let color = hex.replace('#', '');
-    if (color.length === 3) {
-        color = color
-            .split('')
-            .map((c) => c + c)
-            .join('');
-    }
+    if (color.length === 3) color = color.split('').map(c => c + c).join('');
     const r = parseInt(color.substring(0, 2), 16);
     const g = parseInt(color.substring(2, 4), 16);
     const b = parseInt(color.substring(4, 6), 16);
@@ -165,6 +157,11 @@ function hsvToHSL(h, s, v) {
         s: Math.round(sv * 100),   // 飽和度 (0-100)
         l: Math.round(l * 100)     // 亮度 (0-100)
     };
+}
+
+// 轉換 RGB 到 Hex
+function rgbToHex(r, g, b) {
+    return "#" + ((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1).toUpperCase();
 }
 
 // 設定顏色模式的滑桿範圍和標籤
@@ -273,15 +270,32 @@ function showBlocks(rgb, blocks, containerElement) {
         const blockContainer = document.createElement('div');
         blockContainer.classList.add('block-container');
 
+        // 方塊圖片
         const img = document.createElement('img');
         img.src = chrome.runtime.getURL(`/${block.image}`);  // 修改為 block 資料夾中的圖片
         img.alt = block.id.replace('minecraft:', '');  // 使用 block.id 作為圖片的 alt 文字
+        img.classList.add('block-image');  // 為圖片新增class
 
-        const altText = document.createElement('span');
-        altText.textContent = img.alt;
+        // 方塊ID文字
+        const blockId = document.createElement('div');
+        blockId.textContent = img.alt;
 
+        // 顯示顏色區塊
+        const colorBlock = document.createElement('div');
+        colorBlock.textContent = block.color;
+        colorBlock.classList.add('block-color');  // 顏色區塊的 class
+
+        // 組合內容
+        const infoContainer = document.createElement('div');
+        infoContainer.classList.add('block-info');  // 文字內容的區塊
+
+        // 把圖片、ID和顏色加進容器
+        infoContainer.appendChild(blockId);
+        infoContainer.appendChild(colorBlock);
+
+        // 在 blockContainer 裡加上圖片和信息
         blockContainer.appendChild(img);
-        blockContainer.appendChild(altText);
+        blockContainer.appendChild(infoContainer);
         containerElement.appendChild(blockContainer);
     });
 }
@@ -341,11 +355,6 @@ function changeResult(value) {
         const hsv = hslToHSV(hsl.h, hsl.s, hsl.l);
         changeHSVResult(hsv);
     }
-}
-
-// 轉換 RGB 到 Hex
-function rgbToHex(r, g, b) {
-    return "#" + ((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1).toUpperCase();
 }
 
 // 更新顏色並顯示結果
