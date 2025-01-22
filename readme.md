@@ -6,7 +6,7 @@ A web tool that can pick color to find the matching blocks.
 3. Enable **Developer Mode** by clicking the toggle.
 4. Click the **Load unpacked** button and select the directory of the folder you just unzip.
 ## How to use
-* Press `Ctrl`+`B on the web page to capture the color.
+* Press `Ctrl`+`B` on the web page to capture the color.
 * Press `Esc` to close the blocks display.
 * Popup has detailed information and colors can be adjusted there.
 ## Known issues
