@@ -5,108 +5,136 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-size: large;
+      background-color: beige;
+    }
+
+    #container {
+      margin: 1rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 300px;
+    }
+
+    .row {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    #result {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      align-items: center;
+    }
+
+    .block-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+	  margin-bottom: 10px;
+    }
+
+    .block {
+      width: 200px;
+      text-align: right;
+    }
+
+    img {
+      width: 55px;
+      height: 55px;
+      object-fit: cover;
+      object-position: top;
+      margin-right: 10px;
+    }
+
+    .block-id {
+      word-wrap: break-word;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: block;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .block-color {
+      width: 100%;
+      height: 20px;
+      margin-top: 3px;
+    }
+
+    #inputContainer {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    #pickedList {
+      display: flex;
+      flex-direction: column;
+      margin-left: 10px;
+    }
+
+    #hexValue {
+      font-weight: bold;
+    }
+
+    #slidexValueContainer {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    #sliderContainer {
+      display: flex;
+      flex-direction: column;
+      width: 90%;
+    }
+
+    #xSlider, #ySlider, #zSlider {
+      cursor: col-resize;
+    }
+
+    #slidexValueContainer input[type="number"] {
+      width: 60px; /* 設定數值輸入框的寬度 */
+      text-align: center;
+    }
+
+    label {
+      margin-top: 10px;
+    }
+
+    #colorModeButtons button {
+      width: 30%;
+      padding: 8px;
+      margin: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background-color: #f0f0f0;
+      transition: background-color 0.3s ease;
+      cursor: pointer;
+    }
+
+    #colorModeButtons button.active {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+  </style>
 </head>
-<style>
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-size: large;
-    background-color: beige;
-  }
-
-  #container {
-    margin: 1rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 300px;
-  }
-
-  .row {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    margin-bottom: 10px;
-  }
-
-  #result {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    align-items: center;
-  }
-
-  .block-container {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    margin: 5px;
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  img {
-    width: 50px;
-    margin-right: 10px;
-  }
-
-  #inputContainer {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    width: 100%;
-  }
-
-  #pickedList {
-    display: flex;
-    flex-direction: column;
-    margin-left: 10px;
-  }
-
-  #hexValue {
-    font-weight: bold;
-  }
-
-  #slidexValueContainer {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-  }
-
-  #sliderContainer {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-  }
-
-  /* 讓滑鼠懸停在 RGB 滑桿上時顯示 col-resize 游標 */
-  #xSlider, #ySlider, #zSlider {
-    cursor: col-resize;
-  }
-
-  label {
-    margin-top: 10px;
-  }
-
-  /* 顏色模式按鈕的樣式 */
-  #colorModeButtons button {
-    width: 30%;
-    padding: 10px;
-    margin: 5px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #f0f0f0;
-    transition: background-color 0.3s ease;
-    cursor: pointer;
-  }
-
-  #colorModeButtons button.active {
-    background-color: #4CAF50; /* 當前模式為綠色 */
-    color: white;
-  }
-</style>
 
 <body>
   <div id="container">
@@ -115,14 +143,14 @@
       <input type="color" id="input">
       <div id="hexValue"></div>
     </div>
-    
+
     <!-- 新增 RGB, HSL, HSV 按鈕 -->
     <div id="colorModeButtons" class="row">
       <button id="rgbButton">RGB</button>
       <button id="hslButton">HSL</button>
       <button id="hsvButton">HSV</button>
     </div>
-	
+
     <!-- 色彩滑桿 -->
     <div id="sliderContainer">
       <div id="slidexValueContainer" class="row">
@@ -143,7 +171,30 @@
     </div>
 
     <!-- 顯示匹配的顏色 -->
-    <div id="result"></div>
+    <div id="result">
+      <div class="block-container">
+        <img src="https://via.placeholder.com/50" alt="Color 1">
+        <div class="block">
+          <div class="block-id">Color 1</div>
+          <div class="block-color" style="background-color: #ff5733;"></div>
+        </div>
+      </div>
+      <div class="block-container">
+        <img src="https://via.placeholder.com/50" alt="Color 2">
+        <div class="block">
+          <div class="block-id">Color 2</div>
+          <div class="block-color" style="background-color: #33c1ff;"></div>
+        </div>
+      </div>
+      <div class="block-container">
+        <img src="https://via.placeholder.com/50" alt="Color 3">
+        <div class="block">
+          <div class="block-id">Color 3</div>
+          <div class="block-color" style="background-color: #ff33b5;"></div>
+        </div>
+      </div>
+    </div>
+
     <div id="pickedList"></div>
   </div>
 
