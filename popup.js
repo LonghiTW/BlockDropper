@@ -24,6 +24,16 @@ async function loadBlockColors() {
 // 顏色模式選擇區的樣式
 const modeButtons = document.querySelectorAll('#colorModeButtons button');
 
+// 創建顯示結果的元素
+const result = document.getElementById('result');
+const input = document.getElementById('input');
+const hexValue = document.getElementById('hexValue');
+const pickedList = document.getElementById('pickedList');
+
+// 色彩滑桿元素
+let xSlider, ySlider, zSlider;
+let xValue, yValue, zValue;
+
 // 變更顏色模式按鈕的樣式，並設定選中狀態
 function updateColorModeButtonStyle(mode) {
     modeButtons.forEach(button => {
@@ -45,124 +55,10 @@ modeButtons.forEach(button => {
     });
 });
 
-// 創建顯示結果的元素
-const result = document.getElementById('result');
-const input = document.getElementById('input');
-const hexValue = document.getElementById('hexValue');
-const pickedList = document.getElementById('pickedList');
-
-// 色彩滑桿元素
-let xSlider, ySlider, zSlider;
-let xValue, yValue, zValue;
-
 // 初始化時設定顏色模式
 document.getElementById('rgbButton').addEventListener('click', () => updateColorMode('rgb'));
 document.getElementById('hslButton').addEventListener('click', () => updateColorMode('hsl'));
 document.getElementById('hsvButton').addEventListener('click', () => updateColorMode('hsv'));
-
-// 顏色轉換函式：Hex -> RGB
-function hexToRGB(hex) {
-    if (!hex) return null;
-    let color = hex.replace('#', '');
-    if (color.length === 3) color = color.split('').map(c => c + c).join('');
-    const r = parseInt(color.substring(0, 2), 16);
-    const g = parseInt(color.substring(2, 4), 16);
-    const b = parseInt(color.substring(4, 6), 16);
-    return { r, g, b };
-}
-
-// RGB轉換為HSL
-function rgbToHSL(r, g, b) {
-    r /= 255;
-    g /= 255;
-    b /= 255;
-    const max = Math.max(r, g, b);
-    const min = Math.min(r, g, b);
-    let h, s, l = (max + min) / 2;
-
-    if (max === min) {
-        h = s = 0; // 無色
-    } else {
-        const d = max - min;
-        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-        switch (max) {
-            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-            case g: h = (b - r) / d + 2; break;
-            case b: h = (r - g) / d + 4; break;
-        }
-        h /= 6;
-    }
-    return {
-        h: Math.round(h * 360),
-        s: Math.round(s * 100),
-        l: Math.round(l * 100)
-    };
-}
-
-// HSL轉換為RGB
-function hslToRGB(h, s, l) {
-    s /= 100;
-    l /= 100;
-    const c = (1 - Math.abs(2 * l - 1)) * s;
-    const x = c * (1 - Math.abs((h / 60) % 2 - 1));
-    const m = l - c / 2;
-    let r, g, b;
-
-    if (0 <= h && h < 60) {
-        r = c; g = x; b = 0;
-    } else if (60 <= h && h < 120) {
-        r = x; g = c; b = 0;
-    } else if (120 <= h && h < 180) {
-        r = 0; g = c; b = x;
-    } else if (180 <= h && h < 240) {
-        r = 0; g = x; b = c;
-    } else if (240 <= h && h < 300) {
-        r = x; g = 0; b = c;
-    } else {
-        r = c; g = 0; b = x;
-    }
-
-    return {
-        r: Math.round((r + m) * 255),
-        g: Math.round((g + m) * 255),
-        b: Math.round((b + m) * 255)
-    };
-}
-
-// HSL -> HSV 轉換
-function hslToHSV(h, s, l) {
-    s /= 100;
-    l /= 100;
-
-    let v = l + s * Math.min(l, 1 - l);
-    let sv = v === 0 ? 0 : 2 * (v - l) / v;
-
-    return {
-        h: h,                  // 色相 (0-360)
-        s: Math.round(sv * 100), // 飽和度 (0-100)
-        v: Math.round(v * 100)   // 明度 (0-100)
-    };
-}
-
-// HSV轉HSL
-function hsvToHSL(h, s, v) {
-    s /= 100;
-    v /= 100;
-
-    let l = (2 - s) * v / 2;
-    let sv = (l !== 0 && l !== 1) ? (v - l) / Math.min(l, 1 - l) : s;
-
-    return {
-        h: h,                      // 色相 (0-360)
-        s: Math.round(sv * 100),   // 飽和度 (0-100)
-        l: Math.round(l * 100)     // 亮度 (0-100)
-    };
-}
-
-// 轉換 RGB 到 Hex
-function rgbToHex(r, g, b) {
-    return "#" + ((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1).toUpperCase();
-}
 
 // 設定顏色模式的滑桿範圍和標籤
 function updateColorMode(mode) {
@@ -219,7 +115,7 @@ function updateColorMode(mode) {
 
 // 設置滑桿並根據顏色模式設置對應值
 function setSlidersFromHex(hex) {
-    const { r, g, b } = hexToRGB(hex);
+    const { r, g, b } = utils.hexToRGB(hex);
 
     if (currentMode === 'rgb') {
         // 如果是 RGB 模式，直接設置 RGB 滑桿
@@ -231,7 +127,7 @@ function setSlidersFromHex(hex) {
         zValue.value = b;
     } else if (currentMode === 'hsl') {
         // 如果是 HSL 模式，先將 Hex 轉為 RGB，然後再轉為 HSL
-        const hsl = rgbToHSL(r, g, b);
+        const hsl = utils.rgbToHSL(r, g, b);
         xSlider.value = hsl.h;
         ySlider.value = hsl.s;
         zSlider.value = hsl.l;
@@ -240,8 +136,8 @@ function setSlidersFromHex(hex) {
         zValue.value = hsl.l;
     } else if (currentMode === 'hsv') {
         // 如果是 HSV 模式，先將 Hex 轉為 RGB，再轉為 HSL，然後轉為 HSV
-        const hsl = rgbToHSL(r, g, b);
-        const hsv = hslToHSV(hsl.h, hsl.s, hsl.l);
+        const hsl = utils.rgbToHSL(r, g, b);
+        const hsv = utils.hslToHSV(hsl.h, hsl.s, hsl.l);
         xSlider.value = hsv.h;
         ySlider.value = hsv.s;
         zSlider.value = hsv.v;
@@ -253,20 +149,10 @@ function setSlidersFromHex(hex) {
 
 // 計算顏色距離並顯示對應圖片
 function showBlocks(rgb, blocks, containerElement) {
-    // 計算顏色距離並顯示對應圖片
-    const distance = blocks.map((block) => {
-        const blockRGB = { r: block.r, g: block.g, b: block.b };
-        const dist = Math.sqrt(
-            Math.pow(blockRGB.r - rgb.r, 2) +
-            Math.pow(blockRGB.g - rgb.g, 2) +
-            Math.pow(blockRGB.b - rgb.b, 2)
-        );
-        return { ...block, distance: dist };
-    });
-
-    // 根據顏色距離排序，選擇前5個最接近的顏色
-    distance.sort((a, b) => a.distance - b.distance);
-    distance.slice(0, 5).forEach((block) => {
+    // 計算顏色距離
+    const closestBlocks = utils.findClosestBlocks(rgb, blocks);
+    // 顯示對應圖片
+    closestBlocks.forEach((block) => {
         const blockContainer = document.createElement('div');
         blockContainer.classList.add('block-container');
 
@@ -318,7 +204,7 @@ function changeHSLResult(hsl) {
 
     if (hsl && blocks.length > 0) {
         // 先將 HSL 轉為 RGB
-        const rgb = hslToRGB(hsl.h, hsl.s, hsl.l);
+        const rgb = utils.hslToRGB(hsl.h, hsl.s, hsl.l);
 
         // 使用通用函數來計算顏色距離並顯示圖片
         showBlocks(rgb, blocks, result);
@@ -332,8 +218,8 @@ function changeHSVResult(hsv) {
 
     if (hsv && blocks.length > 0) {
         // 先將 HSV 轉為 RGB
-        const hsl = hsvToHSL(hsv.h, hsv.s, hsv.v); // 先將 HSV 轉為 HSL
-        const rgb = hslToRGB(hsl.h, hsl.s, hsl.l); // 再將 HSL 轉為 RGB
+        const hsl = utils.hsvToHSL(hsv.h, hsv.s, hsv.v); // 先將 HSV 轉為 HSL
+        const rgb = utils.hslToRGB(hsl.h, hsl.s, hsl.l); // 再將 HSL 轉為 RGB
 
         // 使用通用函數來計算顏色距離並顯示圖片
         showBlocks(rgb, blocks, result);
@@ -342,17 +228,17 @@ function changeHSVResult(hsv) {
 
 // 更新顏色顯示
 function changeResult(value) {
-    const rgb = hexToRGB(value);
+    const rgb = utils.hexToRGB(value);
     
     // 根據當前顏色模式顯示結果
     if (currentMode === 'rgb') {
         changeRGBResult(rgb);
     } else if (currentMode === 'hsl') {
-        const hsl = rgbToHSL(rgb.r, rgb.g, rgb.b);
+        const hsl = utils.rgbToHSL(rgb.r, rgb.g, rgb.b);
         changeHSLResult(hsl);
     } else if (currentMode === 'hsv') {
-        const hsl = rgbToHSL(rgb.r, rgb.g, rgb.b);
-        const hsv = hslToHSV(hsl.h, hsl.s, hsl.l);
+        const hsl = utils.rgbToHSL(rgb.r, rgb.g, rgb.b);
+        const hsv = utils.hslToHSV(hsl.h, hsl.s, hsl.l);
         changeHSVResult(hsv);
     }
 }
@@ -369,7 +255,7 @@ function updateColorFromSliders() {
         xValue.value = r;
         yValue.value = g;
         zValue.value = b;
-        const hex = rgbToHex(r, g, b);
+        const hex = utils.rgbToHex(r, g, b);
         chrome.storage.local.set({ hex });
         document.getElementById('input').value = hex;
         changeResult(hex);  // 更新結果顯示
@@ -384,8 +270,8 @@ function updateColorFromSliders() {
         xValue.value = h;
         yValue.value = s;
         zValue.value = l;
-        const rgb = hslToRGB(h, s, l);  // 將 HSL 轉換為 RGB
-        const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
+        const rgb = utils.hslToRGB(h, s, l);  // 將 HSL 轉換為 RGB
+        const hex = utils.rgbToHex(rgb.r, rgb.g, rgb.b);
         chrome.storage.local.set({ hex });
         document.getElementById('input').value = hex;
         changeResult(hex);  // 更新結果顯示
@@ -400,9 +286,9 @@ function updateColorFromSliders() {
         xValue.value = h;
         yValue.value = s;
         zValue.value = v;
-        const hsl = hsvToHSL(h, s, v);  // 先將 HSV 轉為 HSL
-        const rgb = hslToRGB(hsl.h, hsl.s, hsl.l);  // 然後將 HSL 轉為 RGB
-        const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
+        const hsl = utils.hsvToHSL(h, s, v);  // 先將 HSV 轉為 HSL
+        const rgb = utils.hslToRGB(hsl.h, hsl.s, hsl.l);  // 然後將 HSL 轉為 RGB
+        const hex = utils.rgbToHex(rgb.r, rgb.g, rgb.b);
         chrome.storage.local.set({ hex });
         document.getElementById('input').value = hex;
         changeResult(hex);  // 更新結果顯示
