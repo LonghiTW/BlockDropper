@@ -55,6 +55,11 @@ chrome.runtime.onMessage.addListener((message) => {
         // 當收到 "pickColor" 訊息時，執行 handlePickColor
         handlePickColor();
     }
+	
+	if (message.action === "clearResult") {
+        // 當收到 "clearResult" 訊息時，清除結果
+        result.innerHTML = '';
+    }
 });
 
 // 6. 顏色選擇函式
@@ -99,10 +104,3 @@ function handlePickColor() {
         }
     });
 }
-
-// 7. 按鍵事件，按下 Esc 清除結果
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        result.innerHTML = '';
-    }
-});
