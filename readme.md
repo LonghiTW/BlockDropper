@@ -11,6 +11,5 @@ A web tool that can pick color to find the matching blocks.
 * Popup has detailed information and colors can be adjusted there.
 ## Known issues
 * When there are multiple screens and extended display, the color cannot be captured normally.
-* The blocks display box does not work properly and cannot be closed using `Esc` on web pages with frames.
 ## Authorization
 This project is licensed under the MIT license.
