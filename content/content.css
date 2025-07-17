@@ -1,3 +1,21 @@
+#overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	z-index: 999999;
+	cursor: crosshair;
+	background: rgba(0,0,0,0.05);
+}
+
+#selectionBox {
+	position: fixed;
+	border: 2px dashed blue;
+	background: rgba(0, 136, 255, 0.2);
+	z-index: 1000000;
+}
+
 #result {
 	display: flex;
 	position: fixed;
@@ -10,9 +28,19 @@
 	max-height: 300px;
 }
 
+#sideResult {
+	position: fixed;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    z-index: 999998;
+}
+
 .block {
 	width: 50px;
 	height: 50px;
-	object-fit: cover;
-	object-position: top;
+    object-fit: cover;
+    object-position: top;
 }
