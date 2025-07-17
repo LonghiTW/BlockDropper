@@ -1,100 +1,237 @@
 (async () => {
-    // 🔧 DOM 元素初始化
-    const resultBox = createResultBox();
+    // 初始化 Tooltip 容器
+    const resultBox = createTooltipBox('result');
+    const sideResultBox = createTooltipBox('sideResult');
 
-    // 🧱 Block 色碼資料
-    const blocks = await loadBlockColors();
+    // 載入方塊色碼資料
+    const blocks = await utils.loadBlockColors();
 
-    // 🎨 追蹤前一次選色，避免重複處理
+    let screenImage = null;
+    let isTracking = false;
+    let lastColor = null;
     let lastPicked = null;
+    let cancelPickColor = null;
 
-    // 📌 滑鼠移動更新提示框位置
+    // 當滑鼠移動時，更新 Tooltip 並即時追蹤顏色
     document.addEventListener('mousemove', (e) => {
         updateTooltipPosition(resultBox, e.clientX, e.clientY);
+
+        if (!isTracking || !screenImage) return;
+
+        const rect = getRectAroundPoint(e.clientX, e.clientY, 10);
+        averageColor(screenImage, rect, ({ rgb }) => {
+            if (!rgb || isSameColor(rgb, lastColor)) return;
+            lastColor = rgb;
+
+            const [topMatch] = utils.findClosestBlocks(rgb, blocks, 1);
+            renderMatches([topMatch], resultBox);
+        });
     });
 
-    // 📬 處理來自背景的訊息
-    chrome.runtime.onMessage.addListener((msg) => {
-        if (msg.action === "pickColor") {
-			// 當收到 "pickColor" 訊息時，執行 pickColorHandler
+    // 接收背景訊息（開始選色 / 清除結果）
+    chrome.runtime.onMessage.addListener(({ action }) => {
+        if (action === "pickColor") {
             pickColorHandler();
-        } else if (msg.action === "clearResult") {
-			// 當收到 "clearResult" 訊息時，清除結果
-            resultBox.innerHTML = '';
+        } else if (action === "clearResult") {
+            clearResults();
         }
     });
 
-    // 🎯 顏色選擇函式
+    // 處理選色邏輯
     async function pickColorHandler() {
         try {
-            const { sRGBHex } = await new EyeDropper().open();
-            const rgb = utils.hexToRGB(sRGBHex);
+            // 擷取整個畫面畫面作為底圖
+            chrome.runtime.sendMessage({ action: "capture" }, (res) => {
+                screenImage = new Image();
+                screenImage.src = res.dataUrl;
+                screenImage.onload = () => (isTracking = true);
+            });
 
-            // 若顏色未變化或無效，則不做處理
+            // 等待使用者框選
+            const { rgb, hex } = await pickColorFromSelection();
             if (!rgb || isSameColor(rgb, lastPicked)) return;
 
             lastPicked = rgb;
-            resultBox.innerHTML = '';
+            const matches = utils.findClosestBlocks(rgb, blocks, 5);
+            renderMatches(matches, sideResultBox);
 
-            const topMatches = utils.findClosestBlocks(rgb, blocks, 5);
-            renderMatches(topMatches, resultBox);
-
-            // 儲存選擇的 Hex 顏色
-            chrome.storage.local.set({ hex: sRGBHex });
+            // 儲存選取顏色
+            chrome.storage.local.set({ hex });
         } catch (err) {
-			if (err instanceof DOMException && err.message.includes("EyeDropper is not available")) {
-                // 忽略這個特定錯誤
-                console.log("EyeDropper is not available.");
-            } else {
-                console.error("Error during color pick:", err);
-			}
+            console.error("Error during color pick:", err);
         }
     }
 
-    // ✅ 工具函式區
+    // 清除所有結果與追蹤狀態
+    function clearResults() {
+        resultBox.innerHTML = '';
+        sideResultBox.innerHTML = '';
+        isTracking = false;
+        screenImage = null;
+        lastColor = null;
+        if (cancelPickColor) cancelPickColor();
+    }
 
-    // 建立顯示結果的元素
-    function createResultBox() {
+    // 處理框選邏輯
+    async function pickColorFromSelection() {
+        return new Promise((resolve) => {
+            if (window.__colorPickerOverlay__) return;
+
+            const overlay = createOverlay();
+            let startX, startY, selectionBox, rect;
+
+            cancelPickColor = () => {
+                overlay.remove();
+                selectionBox?.remove();
+                delete window.__colorPickerOverlay__;
+                cancelPickColor = null;
+            };
+
+            overlay.addEventListener('mousedown', (e) => {
+                startX = e.clientX;
+                startY = e.clientY;
+
+                selectionBox = createSelectionBox();
+                document.body.appendChild(selectionBox);
+
+                const onMouseMove = (e) => {
+                    const x = Math.min(e.clientX, startX);
+                    const y = Math.min(e.clientY, startY);
+                    const w = Math.abs(e.clientX - startX);
+                    const h = Math.abs(e.clientY - startY);
+
+                    Object.assign(selectionBox.style, {
+                        left: `${x}px`,
+                        top: `${y}px`,
+                        width: `${w}px`,
+                        height: `${h}px`,
+                    });
+                };
+
+                const onMouseUp = () => {
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('mouseup', onMouseUp);
+
+                    rect = (!selectionBox.style.width || !selectionBox.style.height)
+                        ? getRectAroundPoint(startX, startY, 10)
+                        : selectionBox.getBoundingClientRect();
+
+                    overlay.remove();
+                    selectionBox.remove();
+                    delete window.__colorPickerOverlay__;
+
+                    chrome.runtime.sendMessage({ action: "capture" }, (res) => {
+                        const img = new Image();
+                        img.src = res.dataUrl;
+                        img.onload = () => averageColor(img, rect, resolve);
+                    });
+                };
+
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+            });
+        });
+    }
+
+    // 🧰 工具函數區
+
+    function createTooltipBox(id) {
+        const el = document.createElement('div');
+        el.id = id;
+        document.body.appendChild(el);
+        return el;
+    }
+
+    function createOverlay() {
+        const overlay = document.createElement('div');
+        overlay.id = 'overlay';
+        document.body.appendChild(overlay);
+        window.__colorPickerOverlay__ = overlay;
+        return overlay;
+    }
+
+    function createSelectionBox() {
         const box = document.createElement('div');
-        box.id = 'result';
-        document.body.appendChild(box);
+        box.id = 'selectionBox';
         return box;
     }
 
     function updateTooltipPosition(el, x, y) {
-        el.style.top = `${y + 10}px`;
-        el.style.left = `${x + 10}px`;
+        const padding = 10;
+        const width = el.offsetWidth || 150;
+        const height = el.offsetHeight || 50;
+        let left = x + padding;
+        let top = y + padding;
+
+        if (left + width > window.innerWidth) left = x - width - padding;
+        if (top + height > window.innerHeight) top = y - height - padding;
+
+        el.style.position = 'fixed';
+        el.style.left = `${left}px`;
+        el.style.top = `${top}px`;
     }
 
-    function isSameColor(a, b) {
-        return b && a.r === b.r && a.g === b.g && a.b === b.b;
+    function getRectAroundPoint(x, y, size = 10) {
+        const half = size / 2;
+        const left = Math.max(0, Math.min(x - half, window.innerWidth - size));
+        const top = Math.max(0, Math.min(y - half, window.innerHeight - size));
+        return { left, top, width: size, height: size };
+    }
+
+    function averageColor(img, rect, resolve) {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        ctx.drawImage(img, 0, 0);
+
+        const scaleX = img.width / window.innerWidth;
+        const scaleY = img.height / window.innerHeight;
+        const sx = rect.left * scaleX;
+        const sy = rect.top * scaleY;
+        const sw = rect.width * scaleX;
+        const sh = rect.height * scaleY;
+
+        const data = ctx.getImageData(sx, sy, sw, sh).data;
+        let r = 0, g = 0, b = 0;
+        const total = data.length / 4;
+
+        for (let i = 0; i < data.length; i += 4) {
+            r += data[i];
+            g += data[i + 1];
+            b += data[i + 2];
+        }
+
+        r = Math.round(r / total);
+        g = Math.round(g / total);
+        b = Math.round(b / total);
+        resolve({ rgb: { r, g, b }, hex: utils.rgbToHex(r, g, b) });
     }
 
     function renderMatches(matches, container) {
+        container.innerHTML = '';
         matches.forEach(block => {
             const img = document.createElement('img');
-            img.classList = 'block';
+            img.className = 'block';
             img.src = chrome.runtime.getURL(`/${block.image}`);
             img.alt = block.id.replace('minecraft:', '');
+            img.title = img.alt;
+
+            img.addEventListener('click', async () => {
+                try {
+                    await navigator.clipboard.writeText(img.alt);
+                    img.style.outline = '2px solid limegreen';
+                    setTimeout(() => img.style.outline = '', 500);
+                } catch (err) {
+                    console.error("Clipboard error:", err);
+                }
+            });
+
             container.appendChild(img);
         });
     }
 
-    async function loadBlockColors() {
-        try {
-            const res = await fetch(chrome.runtime.getURL('blockColors.json'));
-            if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
-            const data = await res.json();
-
-            return data.map(block => ({
-                ...block,
-                r: parseInt(block.color.substring(1, 3), 16),
-                g: parseInt(block.color.substring(3, 5), 16),
-                b: parseInt(block.color.substring(5, 7), 16)
-            }));
-        } catch (err) {
-            console.error("Failed to load blockColors.json:", err);
-            return [];
-        }
+    function isSameColor(a, b) {
+        return b && a.r === b.r && a.g === b.g && a.b === b.b;
     }
 })();
