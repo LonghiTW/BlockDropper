@@ -34,7 +34,7 @@
 			"description": "Pick color from web page"
 		},
 		"clear-result": {
-			"suggested_key": {"default":"Alt+C"},
+			"suggested_key": {"default":"Alt+Q"},
 			"description": "Clear result"
 		}
 	}
