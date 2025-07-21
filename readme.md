@@ -10,7 +10,7 @@ A web tool that can pick color to find the matching blocks.
   * Move the mouse to preview the closest matching Minecraft block.
   * Click to capture the average color within a 10×10 pixel area.
   * Click and drag to select a custom area for averaging color.
-* Press `Alt`+`C` to close the blocks display on web page.
+* Press `Alt`+`Q` to close the blocks display on web page.
 * Open the **popup** (via the extension icon) for more detailed controls:
   * Adjust the captured color using RGB, HSL, or HSV sliders.
   * Use the EyeDropper tool to pick a 1-pixel color from anywhere on the screen (even outside the browser window).
