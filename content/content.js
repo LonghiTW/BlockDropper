@@ -212,7 +212,7 @@
         container.innerHTML = '';
         matches.forEach(block => {
             const img = document.createElement('img');
-            img.className = 'block';
+            img.className = 'dropperBlock';
             img.src = chrome.runtime.getURL(`/${block.image}`);
             img.alt = block.id.replace('minecraft:', '');
             img.title = img.alt;
