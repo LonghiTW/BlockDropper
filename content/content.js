@@ -1,7 +1,7 @@
 (async () => {
     // 初始化 Tooltip 容器
-    const resultBox = createTooltipBox('result');
-    const sideResultBox = createTooltipBox('sideResult');
+    const resultBox = createTooltipBox('blockResult');
+    const sideResultBox = createTooltipBox('sideBlockResult');
 
     // 載入方塊色碼資料
     const blocks = await utils.loadBlockColors();
@@ -75,7 +75,7 @@
     // 處理框選邏輯
     async function pickColorFromSelection() {
         return new Promise((resolve) => {
-            if (window.__colorPickerOverlay__) return;
+            if (window.__blockDropperOverlay__) return;
 
             const overlay = createOverlay();
             let startX, startY, selectionBox, rect;
@@ -83,7 +83,7 @@
             cancelPickColor = () => {
                 overlay.remove();
                 selectionBox?.remove();
-                delete window.__colorPickerOverlay__;
+                delete window.__blockDropperOverlay__;
                 cancelPickColor = null;
             };
 
@@ -118,7 +118,7 @@
 
                     overlay.remove();
                     selectionBox.remove();
-                    delete window.__colorPickerOverlay__;
+                    delete window.__blockDropperOverlay__;
 
                     chrome.runtime.sendMessage({ action: "capture" }, (res) => {
                         const img = new Image();
@@ -144,9 +144,9 @@
 
     function createOverlay() {
         const overlay = document.createElement('div');
-        overlay.id = 'overlay';
+        overlay.id = 'blockDropperOverlay';
         document.body.appendChild(overlay);
-        window.__colorPickerOverlay__ = overlay;
+        window.__blockDropperOverlay__ = overlay;
         return overlay;
     }
 
