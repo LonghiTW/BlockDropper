@@ -1,4 +1,4 @@
-#overlay {
+#blockDropperOverlay {
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -16,7 +16,7 @@
 	z-index: 1000000;
 }
 
-#result {
+#blockResult {
 	display: flex;
 	position: fixed;
 	background-color: #f9f9f9;
@@ -28,7 +28,7 @@
 	max-height: 300px;
 }
 
-#sideResult {
+#sideBlockResult {
 	position: fixed;
     top: 50%;
     right: 20px;
