@@ -120,11 +120,7 @@
                     selectionBox.remove();
                     delete window.__blockDropperOverlay__;
 
-                    chrome.runtime.sendMessage({ action: "capture" }, (res) => {
-                        const img = new Image();
-                        img.src = res.dataUrl;
-                        img.onload = () => averageColor(img, rect, resolve);
-                    });
+                    averageColor(screenImage, rect, resolve);
                 };
 
                 document.addEventListener('mousemove', onMouseMove);
