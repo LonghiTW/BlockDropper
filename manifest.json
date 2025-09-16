@@ -1,7 +1,7 @@
 {
 	"manifest_version": 3,
 	"name": "BlockDropper",
-	"version": "2.1",
+	"version": "2.2",
 	"description": "A web tool that can pick color to find the matching blocks.",
 	"permissions": ["tabs", "activeTab", "scripting", "storage"],
 	"host_permissions": ["<all_urls>"],
@@ -39,3 +39,4 @@
 		}
 	}
 }
+
