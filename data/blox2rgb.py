@@ -7,7 +7,18 @@ import json
 
 print('Block data converter\n')
 
-dirname = 'blocks'
+# download block images
+version = "1.21.11"
+zip_url = f"https://github.com/InventivetalentDev/minecraft-assets/archive/refs/tags/{version}.zip"
+zip_file = "assets.zip"
+
+os.system(f"wget {zip_url} -O {zip_file}")
+
+# unzip
+os.system(f"unzip -q {zip_file}")
+
+# block data
+dirname = f'minecraft-assets-{version}/assets/minecraft/textures/block'
 outputFile = 'block_data.json'
 block_list = []
 
@@ -92,6 +103,8 @@ for i in range(len(listImgFound)-1, -1, -1):
     hex_value = "#{:02x}{:02x}{:02x}".format(r, g, b)
 
     # determine tags
+    tags = []
+
     if "mushroom_block" in blockName:
         tags.append("block")
     elif blockName == "bamboo":
@@ -104,7 +117,6 @@ for i in range(len(listImgFound)-1, -1, -1):
             "decoration": ["sapling","allium","cluster","anvil","azalea","azure","shoot","beacon","roots","bell","dripleaf","glazed","box","orchid","bookshelf","coral","stand","brown_mushroom","red_mushroom","bush","cactus","sensor","carrots","cauldron","vines","command","chest","flower","plant","eyeblossom","cocoa","conduit","golem","lantern","torch","fungus","dandelion","pot","egg","ghast","table","fern","frogspawn","lichen","grindstone","core","hopper","ladder","jigsaw","_bud","litter","lectern","lilac","lily","propagule","melon_stem","pumpkin_stem","sprouts","tulip","oxeye","hanging_moss","peony","pitcher","pointed","poppy","comparator","repeater","clump","scaffolding","catalyst","shrieker","vein","pickle","grass","blossom","stonecutter","cane","target","test","tnt","tripwire","crops","rose"]
         }
         
-        tags = []
         for tag, keys in tagKeywords.items():
             if any(k in blockName for k in keys):
                 tags.append(tag)
