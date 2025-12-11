@@ -5,17 +5,23 @@ import math
 import os
 import json
 
-print('blox2rgb with LCh average\n')
+print('Block data converter\n')
 
 dirname = 'blocks'
 outputFile = 'block_data.json'
+block_list = []
+
+excludeBlocks = ["button","door","plate","slab","stairs","rail","barrier","head","gateway","portal","farmland","kelp","lava","wire","seagrass","skeleton","soul_fire","void","water"]
 
 # check if the directory exists
 if not os.path.isdir('./' + dirname):
     raise FileNotFoundError(f'[!] Error -- directory "{dirname}" not found. Make sure it exists in the same folder as this script.')
 
 # get list of all .png files in the directory folder
-listImgFound = [f for f in os.listdir('./' + dirname) if f.endswith('.png')]
+listImgFound = [
+    f for f in os.listdir('./' + dirname)
+    if f.endswith('.png') and not any(key in f for key in excludeBlocks)
+]
 # UPD: Sort images (they used to be read last to first, but now they apparently aren't?)
 listImgFound.sort(reverse=True)
 
@@ -25,12 +31,10 @@ if not listImgFound:
 
 print('[i] Found', len(listImgFound), 'textures in the "' + dirname + '" directory')
 
-# converter
-block_list = []
-
 # cycle through the images starting from the LAST one until -1 is reached
 for i in range(len(listImgFound)-1, -1, -1):
     imgName = listImgFound[i]
+    blockName = os.path.splitext(imgName)[0]
 
     imgProc = Image.open('./' + dirname + '/' + imgName).convert('RGBA')
     
@@ -87,14 +91,36 @@ for i in range(len(listImgFound)-1, -1, -1):
     b = max(0, min(255, round(avg_rgb.rgb_b * 255)))
     hex_value = "#{:02x}{:02x}{:02x}".format(r, g, b)
 
+    # determine tags
+    if "mushroom_block" in blockName:
+        tags.append("block")
+    elif blockName == "bamboo":
+        tags.append("vertical")
+    else:
+        tagKeywords = {
+            "vertical": ["fence","sign","_shelf","trapdoor","pane","wall","banner","candle","bars","chain","rod"],
+            "horizontal": ["trapdoor","bed","carpet","fan","cake","campfire","chain","detector","frame","rod"],
+            "translucent": ["leaves","glass","cobweb","grate","spawner","vault"],
+            "decoration": ["sapling","allium","cluster","anvil","azalea","azure","shoot","beacon","roots","bell","dripleaf","glazed","box","orchid","bookshelf","coral","stand","brown_mushroom","red_mushroom","bush","cactus","sensor","carrots","cauldron","vines","command","chest","flower","plant","eyeblossom","cocoa","conduit","golem","lantern","torch","fungus","dandelion","pot","egg","ghast","table","fern","frogspawn","lichen","grindstone","core","hopper","ladder","jigsaw","_bud","litter","lectern","lilac","lily","propagule","melon_stem","pumpkin_stem","sprouts","tulip","oxeye","hanging_moss","peony","pitcher","pointed","poppy","comparator","repeater","clump","scaffolding","catalyst","shrieker","vein","pickle","grass","blossom","stonecutter","cane","target","test","tnt","tripwire","crops","rose"]
+        }
+        
+        tags = []
+        for tag, keys in tagKeywords.items():
+            if any(k in blockName for k in keys):
+                tags.append(tag)
+    
+    if not tags:
+        tags.append("block")
+
     # append result to the block-storing JSON object
     block_list.append({
-        "id": os.path.splitext(imgName)[0],
+        "id": blockName,
         "hex": hex_value,
-        "lab": lab_value
+        "lab": lab_value,
+        "tags": tags
     })
     
-    print(f'Added {str(imgName)}')
+    print(f'Added {str(blockName)}')
     
 # write to the JSON file
 with open(outputFile, 'w', encoding='utf-8') as f:
