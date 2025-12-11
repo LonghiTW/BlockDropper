@@ -11,7 +11,7 @@ dirname = 'blocks'
 outputFile = 'block_data.json'
 block_list = []
 
-excludeBlocks = ["button","door","plate","slab","stairs","rail","barrier","head","gateway","portal","farmland","kelp","lava","wire","seagrass","skeleton","soul_fire","void","water"]
+excludeBlocks = ["button","door","plate","slab","stairs","rail","barrier","head","gateway","portal","farmland","kelp","lava","wire","seagrass","skeleton","soul_fire","void","water","dust","fire_0","fire_1","emissive","anchor","active"]
 
 # check if the directory exists
 if not os.path.isdir('./' + dirname):
