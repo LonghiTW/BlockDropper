@@ -1,85 +1,126 @@
 (async () => {
-    // 初始化 Tooltip 容器
+    /* ======================================================
+     *  State Management
+     * ====================================================== */
+
+    let screenImage = null;        // Captured screenshot image
+    let isTracking = false;        // Whether live color tracking is enabled
+    let lastColor = null;          // Last tracked color (mousemove)
+    let lastPicked = null;         // Last picked color (selection)
+    let cancelPickColor = null;    // Cancel handler for selection mode
+
+
+    /* ======================================================
+     *  Initialization
+     * ====================================================== */
+
+    // Tooltip containers for live result and final selection
     const resultBox = createTooltipBox('blockResult');
     const sideResultBox = createTooltipBox('sideBlockResult');
 
-    // 載入方塊色碼資料
-    const blocks = await utils.loadBlockColors();
+    // Load block color reference data
+    const blocks = await utils.loadBlockData();
 
-    let screenImage = null;
-    let isTracking = false;
-    let lastColor = null;
-    let lastPicked = null;
-    let cancelPickColor = null;
 
-    // 當滑鼠移動時，更新 Tooltip 並即時追蹤顏色
+    /* ======================================================
+     *  Global Event Listeners
+     * ====================================================== */
+
+    // Track mouse movement for live color detection
     document.addEventListener('mousemove', (e) => {
         updateTooltipPosition(resultBox, e.clientX, e.clientY);
 
         if (!isTracking || !screenImage) return;
 
         const rect = getRectAroundPoint(e.clientX, e.clientY, 10);
-        averageColor(screenImage, rect, ({ rgb }) => {
-            if (!rgb || isSameColor(rgb, lastColor)) return;
-            lastColor = rgb;
 
-            const [topMatch] = utils.findClosestBlocks(rgb, blocks, 1);
+        utils.averageColor(screenImage, rect, (colorData) => {
+            if (!colorData.rgb || isSameColor(colorData.rgb, lastColor)) return;
+
+            lastColor = colorData.rgb;
+            const [topMatch] = utils.findClosestBlocks(
+                colorData.lab,
+                blocks,
+                1,
+                'block'
+            );
+
             renderMatches([topMatch], resultBox);
         });
     });
 
-    // 接收背景訊息（開始選色 / 清除結果）
+    // Listen for messages from background script
     chrome.runtime.onMessage.addListener(({ action }) => {
-        if (action === "pickColor") {
+        if (action === 'pickColor') {
             pickColorHandler();
-        } else if (action === "clearResult") {
+        } else if (action === 'clearResult') {
             clearResults();
         }
     });
 
-    // 處理選色邏輯
+
+    /* ======================================================
+     *  Core Logic
+     * ====================================================== */
+
+    // Handle color picking workflow
     async function pickColorHandler() {
         try {
-            // 擷取整個畫面畫面作為底圖
-            chrome.runtime.sendMessage({ action: "capture" }, (res) => {
+            // Capture current screen as reference image
+            chrome.runtime.sendMessage({ action: 'capture' }, (res) => {
                 screenImage = new Image();
                 screenImage.src = res.dataUrl;
                 screenImage.onload = () => (isTracking = true);
             });
 
-            // 等待使用者框選
-            const { rgb, hex } = await pickColorFromSelection();
-            if (!rgb || isSameColor(rgb, lastPicked)) return;
+            // Wait for user selection
+            const colorData = await pickColorFromSelection();
+            if (!colorData.rgb || isSameColor(colorData.rgb, lastPicked)) return;
 
-            lastPicked = rgb;
-            const matches = utils.findClosestBlocks(rgb, blocks, 5);
+            lastPicked = colorData.rgb;
+
+            const matches = utils.findClosestBlocks(
+                colorData.lab,
+                blocks,
+                5,
+                'block'
+            );
+
             renderMatches(matches, sideResultBox);
 
-            // 儲存選取顏色
-            chrome.storage.local.set({ hex });
+            // Persist selected color
+            chrome.storage.local.set({ hex: colorData.hex });
         } catch (err) {
-            console.error("Error during color pick:", err);
+            console.error('Error during color pick:', err);
         }
     }
 
-    // 清除所有結果與追蹤狀態
+    // Reset UI state and tracking
     function clearResults() {
         resultBox.innerHTML = '';
         sideResultBox.innerHTML = '';
         isTracking = false;
         screenImage = null;
         lastColor = null;
+
         if (cancelPickColor) cancelPickColor();
     }
 
-    // 處理框選邏輯
-    async function pickColorFromSelection() {
+
+    /* ======================================================
+     *  Selection Logic
+     * ====================================================== */
+
+    // Handle drag selection or click-based color picking
+    function pickColorFromSelection() {
         return new Promise((resolve) => {
             if (window.__blockDropperOverlay__) return;
 
             const overlay = createOverlay();
-            let startX, startY, selectionBox, rect;
+            let startX, startY;
+            let selectionBox, rect;
 
+            // Allow external cancellation
             cancelPickColor = () => {
                 overlay.remove();
                 selectionBox?.remove();
@@ -112,6 +153,7 @@
                     document.removeEventListener('mousemove', onMouseMove);
                     document.removeEventListener('mouseup', onMouseUp);
 
+                    // Use click-based sampling if no drag size exists
                     rect = (!selectionBox.style.width || !selectionBox.style.height)
                         ? getRectAroundPoint(startX, startY, 10)
                         : selectionBox.getBoundingClientRect();
@@ -120,7 +162,7 @@
                     selectionBox.remove();
                     delete window.__blockDropperOverlay__;
 
-                    averageColor(screenImage, rect, resolve);
+                    utils.averageColor(screenImage, rect, resolve);
                 };
 
                 document.addEventListener('mousemove', onMouseMove);
@@ -129,7 +171,10 @@
         });
     }
 
-    // 🧰 工具函數區
+
+    /* ======================================================
+     *  Utility Functions
+     * ====================================================== */
 
     function createTooltipBox(id) {
         const el = document.createElement('div');
@@ -152,10 +197,12 @@
         return box;
     }
 
+    // Position tooltip while keeping it inside viewport
     function updateTooltipPosition(el, x, y) {
         const padding = 10;
         const width = el.offsetWidth || 150;
         const height = el.offsetHeight || 50;
+
         let left = x + padding;
         let top = y + padding;
 
@@ -167,59 +214,34 @@
         el.style.top = `${top}px`;
     }
 
+    // Create a sampling rectangle centered at a point
     function getRectAroundPoint(x, y, size = 10) {
         const half = size / 2;
         const left = Math.max(0, Math.min(x - half, window.innerWidth - size));
         const top = Math.max(0, Math.min(y - half, window.innerHeight - size));
+
         return { left, top, width: size, height: size };
     }
 
-    function averageColor(img, rect, resolve) {
-        const canvas = document.createElement('canvas');
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx = canvas.getContext('2d', { willReadFrequently: true });
-        ctx.drawImage(img, 0, 0);
-
-        const scaleX = img.width / window.innerWidth;
-        const scaleY = img.height / window.innerHeight;
-        const sx = rect.left * scaleX;
-        const sy = rect.top * scaleY;
-        const sw = rect.width * scaleX;
-        const sh = rect.height * scaleY;
-
-        const data = ctx.getImageData(sx, sy, sw, sh).data;
-        let r = 0, g = 0, b = 0;
-        const total = data.length / 4;
-
-        for (let i = 0; i < data.length; i += 4) {
-            r += data[i];
-            g += data[i + 1];
-            b += data[i + 2];
-        }
-
-        r = Math.round(r / total);
-        g = Math.round(g / total);
-        b = Math.round(b / total);
-        resolve({ rgb: { r, g, b }, hex: utils.rgbToHex(r, g, b) });
-    }
-
+    // Render matched blocks into a container
     function renderMatches(matches, container) {
         container.innerHTML = '';
+
         matches.forEach(block => {
             const img = document.createElement('img');
             img.className = 'dropperBlock';
-            img.src = chrome.runtime.getURL(`/${block.image}`);
-            img.alt = block.id.replace('minecraft:', '');
-            img.title = img.alt;
+            img.src = block.image;
+            img.alt = block.id;
+            img.title = block.id;
 
+            // Copy block ID on click
             img.addEventListener('click', async () => {
                 try {
-                    await navigator.clipboard.writeText(img.alt);
+                    await navigator.clipboard.writeText(block.id);
                     img.style.outline = '2px solid limegreen';
-                    setTimeout(() => img.style.outline = '', 500);
+                    setTimeout(() => (img.style.outline = ''), 500);
                 } catch (err) {
-                    console.error("Clipboard error:", err);
+                    console.error('Clipboard error:', err);
                 }
             });
 
@@ -227,6 +249,7 @@
         });
     }
 
+    // Compare two RGB colors for equality
     function isSameColor(a, b) {
         return b && a.r === b.r && a.g === b.g && a.b === b.b;
     }
