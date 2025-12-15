@@ -24,7 +24,7 @@ dirname = f'minecraft-assets-{version}/assets/minecraft/textures/block'
 outputFile = 'block_data.json'
 block_list = []
 
-excludeBlocks = ["button","door","plate","slab","stairs","rail","barrier","head","gateway","portal","farmland","kelp","lava","wire","seagrass","skeleton","soul_fire","void","water","dust","fire_0","fire_1","emissive","anchor","active","destroy","debug"]
+excludeBlocks = ["button","door","plate","slab","stairs","rail","barrier","head","gateway","portal","farmland","kelp","lava","wire","seagrass","skeleton","soul_fire","void","water","dust","fire_0","fire_1","emissive","anchor","active","destroy","debug","item"]
 
 # check if the directory exists
 if not os.path.isdir('./' + dirname):
@@ -107,10 +107,12 @@ for i in range(len(listImgFound)-1, -1, -1):
     # determine tags
     tags = []
 
-    if "mushroom_block" in blockName:
+    if any(key in blockName for key in ("mushroom_block", "bedrock")):
         tags.append("block")
     elif blockName == "bamboo":
         tags.append("vertical")
+    elif "chain_" in blockName:
+        tags.append("decoration")
     else:
         tagKeywords = {
             "vertical": ["fence","sign","_shelf","trapdoor","pane","wall","banner","candle","bars","chain","rod"],
