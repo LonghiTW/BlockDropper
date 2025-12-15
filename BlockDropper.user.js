@@ -7,11 +7,13 @@
 // @match        *://*/*
 // @grant        GM_addStyle
 // @grant        GM_xmlhttpRequest
+// @connect      raw.githubusercontent.com
 // @run-at       document-idle
 // ==/UserScript==
 
 (function() {
     'use strict';
+    let updateStatus = (text) => console.log(text);
 
     /* ======================================================
      * 1. Embedded CSS (content.css)
@@ -68,7 +70,7 @@
             margin: 5px;
             cursor: pointer;
         }
-        
+
         /* New Control Bar Style */
         #blockDropperControlBar {
             position: fixed;
@@ -98,11 +100,11 @@
      * ====================================================== */
     const BLOCK_DATA_URL = 'https://raw.githubusercontent.com/LonghiTW/BlockDropper/main/data/block_data.json';
     let RAW_BLOCKS_DATA = [];
-	
+
 	// Asynchronous function to load block data
     function loadBlockData(callback) {
         updateStatus('Loading the latest block data...');
-        
+
         GM_xmlhttpRequest({
             method: "GET",
             url: BLOCK_DATA_URL,
@@ -508,7 +510,7 @@
         // Modified loadBlockData to use embedded JSON
         loadBlockData() {
             console.log('Userscript: Loading and processing embedded block data...');
-            
+
             // RAW_BLOCKS_DATA is the embedded JSON array
             return RAW_BLOCKS_DATA.map(({ id, hex, ...rest }) => ({
                 id,
@@ -519,7 +521,7 @@
                 b: parseInt(hex.slice(5, 7), 16),
                 // Using a remote CDN for block images, as local files are inaccessible
                 image:
-                    `https://raw.githubusercontent.com/InventivetalentDev/minecraft-block-textures/3.0.0/assets/minecraft/textures/block/${id}.png`,
+                    `https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.21.11/assets/minecraft/textures/block/${id}.png`,
             }));
         },
     };
@@ -563,7 +565,7 @@
             document.body.appendChild(overlay);
             return overlay;
         }
-        
+
         // Create the selection box for area picking
         function createSelectionBox() {
             const selectionBox = document.createElement('div');
@@ -591,7 +593,7 @@
             el.style.left = `${finalX}px`;
             el.style.top = `${finalY}px`;
         }
-        
+
         // Hide the selection box
         function hideSelectionBox() {
             selectionBox.style.display = 'none';
@@ -611,6 +613,22 @@
             return { left, top, width: size, height: size };
         }
 
+        function loadImageBypassCSP(url, img) {
+            GM_xmlhttpRequest({
+                method: "GET",
+                url,
+                responseType: "blob",
+                onload(res) {
+                    const blobUrl = URL.createObjectURL(res.response);
+                    img.src = blobUrl;
+                },
+                onerror() {
+                    img.alt = "load failed";
+                    console.log('GM_xmlhttpRequest failed for', url);
+                }
+            });
+        }
+
         // Render matched blocks into a container
         function renderMatches(matches, container) {
             container.innerHTML = '';
@@ -618,9 +636,9 @@
             matches.forEach(block => {
                 const img = document.createElement('img');
                 img.className = 'dropperBlock';
-                img.src = block.image;
                 img.alt = block.id;
                 img.title = `(${block.distance.toFixed(2)}) ${block.id}`; // Show distance on hover
+                loadImageBypassCSP(block.image, img);
 
                 // Copy block ID on click
                 img.addEventListener('click', async () => {
@@ -636,21 +654,21 @@
                 container.appendChild(img);
             });
         }
-        
+
         // Render the live tracking result box
         function renderResultBox(color, matches) {
             resultBox.innerHTML = `
                 <div style="
-                    display: flex; 
+                    display: flex;
                     flex-direction: column;
                     padding: 5px;
                     border-right: 1px solid #ccc;
                     align-items: center;
                 ">
                     <div style="
-                        width: 30px; 
-                        height: 30px; 
-                        background-color: ${color.hex}; 
+                        width: 30px;
+                        height: 30px;
+                        background-color: ${color.hex};
                         border: 1px solid #000;
                     "></div>
                     <div style="font-size: 10px; margin-top: 5px; font-family: monospace;">${color.hex}</div>
@@ -665,9 +683,9 @@
         /* ======================================================
          * Manual Image Input and Processing (New for Userscript)
          * ====================================================== */
-        
+
         let updateStatus = (text) => console.log(text); // Placeholder, updated in createInputUI
-        
+
         /**
          * Cleans up the UI and resets the state.
          */
@@ -684,7 +702,7 @@
             hideSelectionBox();
             resultBox.style.display = 'none';
             sideResultBox.innerHTML = '';
-            
+
             updateStatus('Waiting for image...');
 
             if (overlay) {
@@ -701,7 +719,9 @@
         function setupCanvas(image) {
             if (!imgCanvas) {
                 imgCanvas = document.createElement('canvas');
-                imgContext = imgCanvas.getContext('2d');
+                imgContext = imgCanvas.getContext('2d', {
+                    willReadFrequently: true
+                });
             }
             imgCanvas.width = image.width;
             imgCanvas.height = image.height;
@@ -712,8 +732,9 @@
 
             // Start tracking immediately after image is loaded
             isTracking = true;
-            clearState(); // Reset UI, but keep tracking enabled
-            
+            lastColor = null;
+            lastPicked = null;
+
             // Re-enable/show overlay and set status
             overlay.style.display = 'block';
             overlay.style.cursor = 'crosshair';
@@ -721,7 +742,7 @@
 
             updateStatus(`Picking color (${image.width}x${image.height})`);
         }
-        
+
         /**
          * Loads a File object (from input or paste) into an Image object.
          * @param {File} file - The image file to load.
@@ -730,7 +751,7 @@
             if (!file || !file.type.startsWith('image/')) return;
 
             updateStatus('Loading image...');
-            
+
             const reader = new FileReader();
             reader.onload = (e) => {
                 const image = new Image();
@@ -762,12 +783,12 @@
         function createInputUI() {
             const bar = document.createElement('div');
             bar.id = 'blockDropperControlBar';
-            
+
             // Status Display
             const statusDiv = document.createElement('div');
             statusDiv.id = 'dropperStatus';
             statusDiv.style.fontWeight = 'bold';
-            
+
             // File Input
             const fileInput = document.createElement('input');
             fileInput.type = 'file';
@@ -775,7 +796,7 @@
             fileInput.style.marginTop = '5px';
             fileInput.title = 'Select a screenshot image';
             fileInput.addEventListener('change', (e) => loadImageFile(e.target.files[0]));
-            
+
             // Paste Info
             const pasteInfo = document.createElement('div');
             pasteInfo.innerHTML = 'Or **Ctrl+V / Cmd+V** to paste a screenshot (Press Esc to cancel)';
@@ -786,16 +807,16 @@
             bar.appendChild(statusDiv);
             bar.appendChild(fileInput);
             bar.appendChild(pasteInfo);
-            
+
             document.body.appendChild(bar);
-            
+
             // Bind global paste listener
             document.addEventListener('paste', handlePaste);
 
             // Return a function to update status
             const update = (text) => statusDiv.textContent = `Status: ${text}`;
             update('Waiting for image...');
-            
+
             return { updateStatus: update };
         }
 
@@ -814,7 +835,7 @@
         // NOTE: Since RAW_BLOCKS_DATA is now populated asynchronously by loadBlockData,
         // this call now processes the loaded data.
         blocks = utils.loadBlockData();
-        
+
         // Initialize the new control UI and get status updater
         const controlUI = createInputUI();
         updateStatus = controlUI.updateStatus;
@@ -827,24 +848,24 @@
         // Track mouse movement for live color detection
         document.addEventListener('mousemove', (e) => {
             if (!isTracking || !screenImage || cancelPickColor) return;
-            
+
             // We use clientX/clientY for screen coordinates, but ensure they are within the image bounds
             const x = Math.min(e.clientX, screenImage.width - 5);
             const y = Math.min(e.clientY, screenImage.height - 5);
 
             const rect = getRectAroundPoint(x, y, 10);
-            
+
             // Update live tooltip position based on mouse position
             updateTooltipPosition(resultBox, e.clientX, e.clientY);
 
             utils.averageColor(screenImage, rect, (colorData) => {
                 lastColor = colorData;
-                
+
                 // Find closest blocks (only 'block' tag for live tracking)
                 const matches = utils.findClosestBlocks(
-                    colorData.lab, 
-                    blocks, 
-                    6, 
+                    colorData.lab,
+                    blocks,
+                    6,
                     'block'
                 );
 
@@ -855,14 +876,14 @@
         // Handle selection pick (mousedown/mousemove/mouseup)
         overlay.addEventListener('mousedown', (e) => {
             if (!isTracking || !screenImage || cancelPickColor) return; // Only allow one selection at a time
-            
+
             // Store starting point
             const startX = e.clientX;
             const startY = e.clientY;
-            
+
             // Reset selection UI
             selectionBox.style.display = 'block';
-            
+
             // Lock tracking during selection
             cancelPickColor = () => {
                 document.removeEventListener('mousemove', onMove);
@@ -877,12 +898,12 @@
                 // Determine current selection rectangle
                 const currentX = moveEvent.clientX;
                 const currentY = moveEvent.clientY;
-                
+
                 const left = Math.min(startX, currentX);
                 const top = Math.min(startY, currentY);
                 const width = Math.abs(startX - currentX);
                 const height = Math.abs(startY - currentY);
-                
+
                 // Draw selection box
                 selectionBox.style.left = `${left}px`;
                 selectionBox.style.top = `${top}px`;
@@ -903,11 +924,11 @@
                 const top = Math.min(startY, finalY);
                 const width = Math.abs(startX - finalX);
                 const height = Math.abs(startY - finalY);
-                
+
                 // Only process if a valid area was selected (e.g., area > 5x5)
                 if (width * height > 25) {
-                    
-                    // The bounding box might go outside the image bounds. 
+
+                    // The bounding box might go outside the image bounds.
                     // We must clamp the sampling rectangle to the image size.
                     const samplingRect = {
                         left: Math.max(0, left),
@@ -920,34 +941,34 @@
 
                     utils.averageColor(screenImage, samplingRect, (colorData) => {
                         lastPicked = colorData;
-                        
+
                         // Find closest blocks (Blocks & Decorations)
                         const blocksMatches = utils.findClosestBlocks(
-                            colorData.lab, 
-                            blocks, 
-                            9, 
+                            colorData.lab,
+                            blocks,
+                            9,
                             'block'
                         );
 
                         const decorationsMatches = utils.findClosestBlocks(
-                            colorData.lab, 
-                            blocks, 
-                            9, 
+                            colorData.lab,
+                            blocks,
+                            9,
                             'decoration'
                         ).filter(
                             // Filter out blocks that were already selected as 'block'
                             (d) => !blocksMatches.some(b => b.id === d.id)
                         );
-                        
+
                         // Render final result
                         const finalMatches = blocksMatches.concat(decorationsMatches);
                         renderMatches(finalMatches, sideResultBox);
-                        
+
                         sideResultBox.style.display = 'flex';
                         updateStatus(`Selection complete (Average color: ${colorData.hex})`);
 
                         // Re-enable live tracking UI on subsequent movement
-                        resultBox.style.display = 'flex'; 
+                        resultBox.style.display = 'flex';
                     });
                 } else {
                     // Clicks or tiny selections clear the side result
@@ -955,7 +976,7 @@
                     updateStatus('Picking color...');
                 }
             };
-            
+
             document.addEventListener('mousemove', onMove);
             document.addEventListener('mouseup', onUp);
         });
