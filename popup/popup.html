@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ==================================================
+         Meta & Styles
+         ================================================== -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Color Block Picker</title>
+
+    <!-- Popup styles -->
+    <link rel="stylesheet" href="popup.css" />
+</head>
+
+<body>
+    <!-- ==================================================
+         Root Container
+         ================================================== -->
+    <div id="container">
+
+        <!-- ==============================================
+             Color Input (HEX)
+             ============================================== -->
+        <div id="inputContainer" class="row">
+            <input type="color" id="input" />
+            <div id="hexValue"></div>
+        </div>
+
+
+        <!-- ==============================================
+             Color Mode Selector (RGB / HSL / HSV)
+             ============================================== -->
+        <div id="colorModeButtons" class="row">
+            <button id="rgbButton">RGB</button>
+            <button id="hslButton">HSL</button>
+            <button id="hsvButton">HSV</button>
+        </div>
+
+
+        <!-- ==============================================
+             Color Sliders (X / Y / Z Axis)
+             ============================================== -->
+        <div id="sliderContainer">
+
+            <!-- X Axis -->
+            <div id="slidexValueContainer" class="row">
+                <label for="xSlider">R:</label>
+                <input type="range" id="xSlider" min="0" max="255" value="0" />
+                <input type="number" id="xValue" min="0" max="255" value="0" />
+            </div>
+
+            <!-- Y Axis -->
+            <div id="slidexValueContainer" class="row">
+                <label for="ySlider">G:</label>
+                <input type="range" id="ySlider" min="0" max="255" value="0" />
+                <input type="number" id="yValue" min="0" max="255" value="0" />
+            </div>
+
+            <!-- Z Axis -->
+            <div id="slidexValueContainer" class="row">
+                <label for="zSlider">B:</label>
+                <input type="range" id="zSlider" min="0" max="255" value="0" />
+                <input type="number" id="zValue" min="0" max="255" value="0" />
+            </div>
+
+        </div>
+
+
+        <!-- ==============================================
+             Result Area
+             ============================================== -->
+        <div id="result">
+
+            <!-- -------- Blocks Result -------- -->
+            <h2>Blocks</h2>
+            <div id="blocksResult"></div>
+
+
+            <!-- -------- Decoration Result -------- -->
+            <h2>Decoration</h2>
+
+            <!-- Decoration Filters -->
+            <div id="decorationFilters" class="row">
+                <button
+                    id="verticalFilter"
+                    class="filter-button"
+                    data-filter-mode="none"
+                    data-tag="vertical"
+                >
+                    Vertical
+                </button>
+
+                <button
+                    id="horizontalFilter"
+                    class="filter-button"
+                    data-filter-mode="none"
+                    data-tag="horizontal"
+                >
+                    Horizontal
+                </button>
+
+                <button
+                    id="translucentFilter"
+                    class="filter-button"
+                    data-filter-mode="none"
+                    data-tag="translucent"
+                >
+                    Translucent
+                </button>
+            </div>
+
+            <div id="decorationResult"></div>
+        </div>
+
+
+        <!-- ==============================================
+             Picked History (Reserved)
+             ============================================== -->
+        <div id="pickedList"></div>
+
+    </div>
+
+    <!-- ==================================================
+         Scripts
+         ================================================== -->
+
+    <!-- Shared utilities -->
+    <script src="../utils.js"></script>
+
+    <!-- Popup logic -->
+    <script type="module" src="popup.js"></script>
+</body>
+</html>
