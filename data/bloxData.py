@@ -22,7 +22,7 @@ dirname = f'minecraft-assets-{version}/assets/minecraft/textures/block'
 outputFile = 'block_data.json'
 block_list = []
 
-excludeBlocks = ["button","door","plate","slab","stairs","rail","barrier","head","gateway","portal","farmland","kelp","lava","wire","seagrass","skeleton","soul_fire","void","water","dust","fire_0","fire_1","emissive","anchor","active"]
+excludeBlocks = ["button","door","plate","slab","stairs","rail","barrier","head","gateway","portal","farmland","kelp","lava","wire","seagrass","skeleton","soul_fire","void","water","dust","fire_0","fire_1","emissive","anchor","active","destroy","debug"]
 
 # check if the directory exists
 if not os.path.isdir('./' + dirname):
@@ -114,7 +114,7 @@ for i in range(len(listImgFound)-1, -1, -1):
             "vertical": ["fence","sign","_shelf","trapdoor","pane","wall","banner","candle","bars","chain","rod"],
             "horizontal": ["trapdoor","bed","carpet","fan","cake","campfire","chain","detector","frame","rod"],
             "translucent": ["leaves","glass","cobweb","grate","spawner","vault"],
-            "decoration": ["sapling","allium","cluster","anvil","azalea","azure","shoot","beacon","roots","bell","dripleaf","glazed","box","orchid","bookshelf","coral","stand","brown_mushroom","red_mushroom","bush","cactus","sensor","carrots","cauldron","vines","command","chest","flower","plant","eyeblossom","cocoa","conduit","golem","lantern","torch","fungus","dandelion","pot","egg","ghast","table","fern","frogspawn","lichen","grindstone","core","hopper","ladder","jigsaw","_bud","litter","lectern","lilac","lily","propagule","melon_stem","pumpkin_stem","sprouts","tulip","oxeye","hanging_moss","peony","pitcher","pointed","poppy","comparator","repeater","clump","scaffolding","catalyst","shrieker","vein","pickle","grass","blossom","stonecutter","cane","target","test","tnt","tripwire","crops","rose"]
+            "decoration": ["sapling","allium","cluster","anvil","azalea","azure","shoot","beacon","roots","bell","dripleaf","glazed","box","orchid","bookshelf","coral","stand","brown_mushroom","red_mushroom","bush","cactus","sensor","carrots","cauldron","vines","command","chest","flower","plant","eyeblossom","_ore","cocoa","conduit","golem","lantern","torch","craft","fungus","dandelion","pot","dispenser","egg","ghast","dropper","table","fern","frogspawn","lichen","grindstone","core","hopper","ladder","jigsaw","_bud","litter","lectern","lilac","lily","propagule","melon_stem","pumpkin_stem","sprouts","tulip","oxeye","hanging_moss","peony","petals","pitcher","pointed","poppy","comparator","repeater","clump","scaffolding","catalyst","shrieker","vein","pickle","grass","blossom","stonecutter","cane","target","test","tnt","tripwire","wheat","rose"]
         }
         
         for tag, keys in tagKeywords.items():
