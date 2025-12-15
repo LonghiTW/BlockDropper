@@ -1,3 +1,5 @@
+# "!pip install Pillow colormath" on colab
+
 from PIL import Image
 from colormath.color_objects import XYZColor, sRGBColor, LabColor, LCHabColor
 from colormath.color_conversions import convert_color
