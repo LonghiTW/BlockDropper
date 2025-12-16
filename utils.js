@@ -351,20 +351,25 @@ const utils = {
     async loadBlockData() {
         try {
             const res = await fetch(
-                chrome.runtime.getURL('/data/block_data.json')
+                'https://raw.githubusercontent.com/LonghiTW/BlockDropper/main/data/block_data.json?ts=' + Date.now()
             );
 
-            const data = await res.json();
+            const { meta, blocks } = await res.json();
+			
+			const {
+                minecraftVersion,
+                textureBaseUrl,
+                texturePath,
+            } = meta;
 
-            return data.map(({ id, hex, ...rest }) => ({
+            return blocks.map(({ id, hex, ...rest }) => ({
                 id,
                 hex,
                 ...rest,
                 r: parseInt(hex.slice(1, 3), 16),
                 g: parseInt(hex.slice(3, 5), 16),
                 b: parseInt(hex.slice(5, 7), 16),
-                image:
-                    `https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.21.11/assets/minecraft/textures/block/${id}.png`,
+                image: `${textureBaseUrl}${minecraftVersion}${texturePath}${id}.png`,
             }));
         } catch (err) {
             console.error('Failed to load block colors:', err);
