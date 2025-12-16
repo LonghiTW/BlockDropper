@@ -138,8 +138,18 @@ for i in range(len(listImgFound)-1, -1, -1):
     
     print(f'Added {str(blockName)}')
     
+# output format
+output = {
+    "meta": {
+        "minecraftVersion": version,
+        "textureBaseUrl": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/",
+        "texturePath": "/assets/minecraft/textures/block/"
+    },
+    "blocks": block_list
+}
+
 # write to the JSON file
 with open(outputFile, 'w', encoding='utf-8') as f:
-    json.dump(block_list, f, indent=4, ensure_ascii=False)
+    json.dump(output, f, indent=4, ensure_ascii=False)
 
 print('\nConversion finished --', str(len(listImgFound)), '/', str(len(listImgFound)), 'textures converted.')
