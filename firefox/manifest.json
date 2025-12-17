@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "BlockDropper",
+  "version": "3.0",
+  "description": "A web tool that can pick color to find the matching blocks.",
+  "permissions": ["tabs", "activeTab", "scripting", "storage"],
+  "host_permissions": ["*://*/*"],
+  "action": {
+    "default_popup": "/popup/popup.html",
+    "default_icon": "color-picker.png"
+  },
+  "background": {
+    "scripts": ["utils.js", "background.js"]
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{1bfeb970-cd11-4e4f-98be-f168b04307a2}",
+      "strict_min_version": "109.0"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "css": ["/content/content.css"],
+      "js": ["utils.js", "/content/content.js"]
+    }
+  ],
+  "commands": {
+    "pick-from-webpage": {
+      "suggested_key": { "default": "Alt+A" },
+      "description": "Pick color from web page"
+    },
+    "clear-result": {
+      "suggested_key": { "default": "Alt+Q" },
+      "description": "Clear result"
+    }
+  }
+}
