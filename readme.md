@@ -1,23 +1,57 @@
 # BlockDropper
-A web tool that can pick color to find the matching blocks.
-## How to install
-#### Chrome
-1. Download [ZIP](https://github.com/LonghiTW/BlockDropper/releases) and unzip it.
-2. Go to the Extensions page by entering `chrome://extensions` in a new tab.
-3. Enable **Developer Mode** by clicking the toggle.
-4. Click the **Load unpacked** button and select the directory of the folder you just unzip.
-#### Firefox
-1. Install it on https://addons.mozilla.org/zh-TW/firefox/addon/blockdropper/.
-2. Done!
-## How to use
-* Press `Alt`+`B` on any web page to activate color capture:
-  * Move the mouse to preview the closest matching Minecraft block.
-  * Click to capture the average color within a 10×10 pixel area.
-  * Click and drag to select a custom area for averaging color.
-* Press `Alt`+`Q` to close the blocks display on web page.
-* Open the **popup** (via the extension icon) for more detailed controls:
-  * Adjust the captured color using RGB, HSL, or HSV sliders.
-  * Use the EyeDropper tool to pick a 1-pixel color from anywhere on the screen (even outside the browser window).
-## Authorization
-This project is licensed under the MIT license.
 
+A web tool that can pick color from any webpage to find the matching Minecraft blocks.
+
+## 🚀 Installation
+
+### Chrome
+
+1. Download the [Latest Release ZIP](https://github.com/LonghiTW/BlockDropper/releases) and unzip it.
+2. Open Chrome and navigate to `chrome://extensions`.
+3. Enable **Developer Mode** (top right toggle).
+4. Click **Load unpacked** and select the unzipped folder.
+
+### Firefox
+
+1. Install it directly from the [Firefox Add-ons Store (AMO)](https://addons.mozilla.org/firefox/addon/blockdropper/).
+2. Done!
+
+## ⌨️ How to Use
+
+### Shortcuts
+
+| Action | Chrome (Default) | Firefox (Default) |
+| --- | --- | --- |
+| **Activate Color Picker** | `Alt` + `B` | `Alt` + `A` |
+| **Clear Results** | `Alt` + `Q` | `Alt` + `Q` |
+
+> [!TIP]
+> **Custom Shortcuts:** Both Chrome and Firefox users can customize these keys in the browser's extension shortcut settings (`chrome://extensions/shortcuts` or `about:addons` -> Settings icon).
+
+### Features
+
+#### Color Picker
+* **Hover:** Preview the closest matching Minecraft block in real-time.
+* **Single Click:** Capture the average color of a 10×10 area.
+* **Click & Drag:** Select a custom area for color averaging.
+
+#### Popup Tools
+* **EyeDropper:** Pick a precise 1-pixel color from anywhere on your screen.
+* **Fine-tune:** Adjust results using **RGB / HSL / HSV** sliders.
+* **Categories:** View matches categorized into **Blocks** and **Decorations**.
+* **Filters:** Filter decorations by types (Vertical, Horizontal, Translucent).
+
+
+
+## 📜 Credits & Legal
+
+### Minecraft Assets
+
+This extension uses images and data sourced from:
+
+* [Minecraft Assets](https://mcasset.cloud/)
+* [Minecraft Wiki](https://minecraft.wiki/)
+
+### Disclaimer
+
+**NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.** This is a fan-made tool and does not claim ownership of any Minecraft-related assets.
