@@ -1,3 +1,11 @@
+/* ======================================================
+ *  browserAPI API Polyfill
+ * ====================================================== */
+
+// Ensure `browserAPI` API compatibility (Chrome / Firefox)
+const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
+
+
 (async () => {
     /* ======================================================
      *  State Management
@@ -50,7 +58,7 @@
     });
 
     // Listen for messages from background script
-    chrome.runtime.onMessage.addListener(({ action }) => {
+    browserAPI.runtime.onMessage.addListener(({ action }) => {
         if (action === 'pickColor') {
             pickColorHandler();
         } else if (action === 'clearResult') {
@@ -67,7 +75,7 @@
     async function pickColorHandler() {
         try {
             // Capture current screen as reference image
-            chrome.runtime.sendMessage({ action: 'capture' }, (res) => {
+            browserAPI.runtime.sendMessage({ action: 'capture' }, (res) => {
                 screenImage = new Image();
                 screenImage.src = res.dataUrl;
                 screenImage.onload = () => (isTracking = true);
@@ -89,7 +97,7 @@
             renderMatches(matches, sideResultBox);
 
             // Persist selected color
-            chrome.storage.local.set({ hex: colorData.hex });
+            browserAPI.storage.local.set({ hex: colorData.hex });
         } catch (err) {
             console.error('Error during color pick:', err);
         }
