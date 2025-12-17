@@ -41,6 +41,8 @@ A web tool that can pick color from any webpage to find the matching Minecraft b
 * **Categories:** View matches categorized into **Blocks** and **Decorations**.
 * **Filters:** Filter decorations by types (Vertical, Horizontal, Translucent).
 
+#### Cloud-Synced Data
+* **Dynamic Block Database:** Block data is fetched from GitHub. This allows new Minecraft blocks to be added or color data to be corrected without requiring a manual extension update from the user.
 
 
 ## 📜 Credits & Legal
@@ -55,3 +57,4 @@ This extension uses images and data sourced from:
 ### Disclaimer
 
 **NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.** This is a fan-made tool and does not claim ownership of any Minecraft-related assets.
+
