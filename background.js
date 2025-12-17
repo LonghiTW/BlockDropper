@@ -1,17 +1,17 @@
 /* ======================================================
- *  Imports
+ *  browserAPI API Polyfill
  * ====================================================== */
 
-importScripts('utils.js');
+// Ensure `browserAPI` API compatibility (Chrome / Firefox)
+const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
 
 
 /* ======================================================
- *  Browser API Polyfill
+ *  Imports
  * ====================================================== */
 
-// Ensure `browser` API compatibility (Chrome / Firefox)
-if (typeof browser === 'undefined') {
-    var browser = chrome;
+if (typeof utils === 'undefined') {
+    importScripts('utils.js');
 }
 
 
@@ -52,9 +52,9 @@ initializeBlocksData();
 
 // Send a message to the currently active tab
 function sendMessageToActiveTab(message) {
-    browser.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    browserAPI.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         if (!tabs || !tabs.length) return;
-        browser.tabs.sendMessage(tabs[0].id, message);
+        browserAPI.tabs.sendMessage(tabs[0].id, message);
     });
 }
 
@@ -63,7 +63,7 @@ function sendMessageToActiveTab(message) {
  *  Command Shortcuts Listener
  * ====================================================== */
 
-browser.commands.onCommand.addListener((command) => {
+browserAPI.commands.onCommand.addListener((command) => {
     switch (command) {
         case 'pick-from-webpage':
             sendMessageToActiveTab({ action: 'pickColor' });
@@ -80,20 +80,24 @@ browser.commands.onCommand.addListener((command) => {
  *  Runtime Message Listener
  * ====================================================== */
 
-browser.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+browserAPI.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
     /* ----------------------------------------------
      *  Screen Capture Request
      * ---------------------------------------------- */
 
     if (msg.action === 'capture') {
-        browser.tabs.captureVisibleTab(
-            null,
-            { format: 'png' },
-            (dataUrl) => {
+        const capturing = browserAPI.tabs.captureVisibleTab(null, { format: 'png' });
+    
+        // 兼容 Promise (Firefox) 與 Callback (Chrome)
+        if (capturing && capturing.then) {
+            capturing.then(dataUrl => sendResponse({ dataUrl }));
+        } else {
+            // Chrome 走法
+            browserAPI.tabs.captureVisibleTab(null, { format: 'png' }, (dataUrl) => {
                 sendResponse({ dataUrl });
-            }
-        );
+            });
+        }
 
         // Keep the message channel open for async response
         return true;
