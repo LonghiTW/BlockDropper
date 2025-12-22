@@ -353,27 +353,16 @@ const utils = {
             const res = await fetch(
                 'https://raw.githubusercontent.com/LonghiTW/BlockDropper/main/data/block_data.json?ts=' + Date.now()
             );
-
-            const { meta, blocks } = await res.json();
 			
-			const {
-                minecraftVersion,
-                textureBaseUrl,
-                texturePath,
-            } = meta;
-
-            return blocks.map(({ id, hex, ...rest }) => ({
-                id,
-                hex,
-                ...rest,
-                r: parseInt(hex.slice(1, 3), 16),
-                g: parseInt(hex.slice(3, 5), 16),
-                b: parseInt(hex.slice(5, 7), 16),
-                image: `${textureBaseUrl}${minecraftVersion}${texturePath}${id}.png`,
-            }));
+            const data = await res.json();
+    
+            return {
+                blocks: data.blocks || [],
+                decorations: data.decorations || []
+            };
         } catch (err) {
             console.error('Failed to load block colors:', err);
-            return [];
+            return { blocks: [], decorations: [] };
         }
     },
 };
