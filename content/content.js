@@ -27,7 +27,7 @@ const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
     const sideResultBox = createTooltipBox('sideBlockResult');
 
     // Load block color reference data
-    const blocks = await utils.loadBlockData();
+    const { blocks } = await utils.loadBlockData();
 
 
     /* ======================================================
@@ -50,7 +50,6 @@ const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
                 colorData.lab,
                 blocks,
                 1,
-                'block'
             );
 
             renderMatches([topMatch], resultBox);
@@ -239,8 +238,8 @@ const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
             const img = document.createElement('img');
             img.className = 'dropperBlock';
             img.src = block.image;
-            img.alt = block.id;
-            img.title = block.id;
+            img.alt = block.name;
+            img.title = block.name;
 
             // Copy block ID on click
             img.addEventListener('click', async () => {
