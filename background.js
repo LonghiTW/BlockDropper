@@ -137,40 +137,25 @@ browserAPI.runtime.onMessage.addListener((msg, sender, sendResponse) => {
          * Apply tag filters and find closest color matches.
          */
         const filterAndFind = async () => {
-            const allBlocks = await initializeBlocksData();
-
-            // 1. Split into Blocks and Decorations
-            const blocksList = allBlocks.filter(
-                b => b.tags?.includes('block')
-            );
-
-            let decorationsList = allBlocks.filter(
-                b => !b.tags || !b.tags.includes('block')
-            );
-
-            // 2. Apply tri-state filters to Decorations
-            decorationsList = decorationsList.filter(block => {
-                const tags = block.tags || [];
-
+            const { blocks, decorations } = await initializeBlocksData();
+        
+            // 1. Blocks 直接用，不需要 filter
+            const blocksList = blocks; 
+        
+            // 2. 僅針對 Decorations 進行標籤過濾
+            const filteredDecorations = decorations.filter(item => {
+                const tags = item.tags || [];
                 for (const tag in filters) {
-                    const mode = filters[tag]; // 'none' | 'include' | 'exclude'
-
-                    if (mode === 'include' && !tags.includes(tag)) {
-                        return false;
-                    }
-
-                    if (mode === 'exclude' && tags.includes(tag)) {
-                        return false;
-                    }
+                    const mode = filters[tag];
+                    if (mode === 'include' && !tags.includes(tag)) return false;
+                    if (mode === 'exclude' && tags.includes(tag)) return false;
                 }
-
                 return true;
             });
-
-            // 3. Compute color matches
+        
             return {
                 blocks: utils.findClosestBlocks(targetLab, blocksList),
-                decorations: utils.findClosestBlocks(targetLab, decorationsList),
+                decorations: utils.findClosestBlocks(targetLab, filteredDecorations),
             };
         };
 
