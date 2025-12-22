@@ -312,11 +312,11 @@ function showBlocks(closestBlocks, container) {
         const img = document.createElement('img');
         img.className = 'block-image';
         img.src = block.image;
-        img.alt = block.id;
+        img.alt = block.name;
 
         const tooltip = document.createElement('div');
         tooltip.className = 'block-id-tooltip';
-        tooltip.textContent = block.id;
+        tooltip.textContent = block.name;
 
         // Copy block ID on click
         div.addEventListener('click', () => {
