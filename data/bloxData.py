@@ -1,4 +1,9 @@
-# "!pip install Pillow colormath" on colab
+# ============================================================
+# Block Data Converter for Minecraft Assets
+# ============================================================
+# Requirements:
+#   !pip install Pillow colormath
+# ============================================================
 
 import os
 import re
@@ -10,31 +15,27 @@ from io import BytesIO
 from colormath.color_objects import sRGBColor, LabColor, LCHabColor
 from colormath.color_conversions import convert_color
 
-print('Block data converter\n')
+# ============================================================
+# CONFIGURATION & CONSTANTS
+# ============================================================
 
-""" settings """
-# info
 version = "1.21.11"
 outputFile = 'block_data.json'
+# Path where the unzipped Minecraft assets are located
+asset_dir = f'minecraft-assets-{version}/assets/minecraft/textures/block'
+asset_file = "assets.zip"
 
+# Cache for Wiki image lookup results
+wiki_cache = {}
 
-# download & unzip
-zip_url = f"https://github.com/InventivetalentDev/minecraft-assets/archive/refs/tags/{version}.zip"
-zip_file = "assets.zip"
-
-if not os.path.exists(zip_file):
-    print(f"Downloading assets for {version}...")
-    os.system(f"wget {zip_url} -O {zip_file}")
-    os.system(f"unzip -q {zip_file}")
-
-# block data
-dirname = f'minecraft-assets-{version}/assets/minecraft/textures/block'
-
-# resource url
+# Remote resource endpoints for metadata and textures
+asset_url = f"https://github.com/InventivetalentDev/minecraft-assets/archive/refs/tags/{version}.zip"
 texture_url = f"https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/{version}/assets/minecraft/textures/block/_list.json"
 models_url = f"https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/{version}/assets/minecraft/models/block/_all.json"
 blockstates_url = f"https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/{version}/assets/minecraft/blockstates/_list.json"
+WIKI_API_URL = "https://minecraft.wiki/api.php"
 
+# Keywords to exclude from the "standard block" processing
 excludeBlocks = [
     "_cake", "_honey", "_stage",
     "active", "air", "anchor",
@@ -51,14 +52,16 @@ excludeBlocks = [
     "plate", "portal", "potted",
     "rail",
     "seagrass", "skeleton", "slab", "soul_fire", "stairs",
-    "void",
+    "vines_plant", "void",
     "wall_", "water", "waxed", "wire", "wood",
 ]
 
+# Blocks that should always be Block
 absoluteBlock = [
     "bedrock", "beehive", "mushroom_block", "suspicious_gravel", "suspicious_sand", "test",
 ]
 
+# Classification keywords for adding metadata tags to the output
 tagKeywords = {
     "vertical": [
         "_shelf",
@@ -112,6 +115,7 @@ tagKeywords = {
     ]
 }
 
+# Mapping for Wiki API redirects or specific names
 wikiMapping = {
     "bamboo_sapling": "Bamboo_Shoot",
     "command_block": "Impulse_Command_Block",
@@ -130,14 +134,17 @@ wikiMapping = {
     "tnt": "TNT"
 }
 
+# Direction tags for Wiki image filtering
 DIRECTION_TAG_MAP = {
-    "(N)":  ["bell", "lichen"],
-    "(EW)": ["bars", "fence", "pane"],
-    "(UD)": ["chain", "froglight"],
-    "(U)":  ["bud", "cluster", "rod", "piston_head"],
-    "(D)":  ["hopper"], 
+    "(N)":   ["bell", "lichen"],
+    "(EW)":  ["bars", "fence", "pane"],
+    "(EWU)": ["wall"],
+    "(UD)":  ["chain", "froglight"],
+    "(U)":   ["bud", "cluster", "rod", "piston_head"],
+    "(D)":   ["hopper"], 
 }
 
+# Predefined colors for specific items (Beds, Banners)
 specific_color = {
     "white": "#F9FFFE",
     "orange": "#F9801D",
@@ -157,119 +164,30 @@ specific_color = {
     "black": "#1D1D21",
 }
 
-""" blocks """
-# creat blocks list
+# ============================================================
+# UTILITIES
+# ============================================================
 
-notBlocks = excludeBlocks + [
-    kw
-    for group in tagKeywords.values()
-    for kw in group
-]
-
-def is_block_exception(name: str) -> bool:
-    return any(exc in name for exc in absoluteBlock)
-
-def should_exclude(name: str) -> bool:
-    if is_block_exception(name):
-        return False
-    if "coral" in name and "block" not in name:
-        return True
-    return any(keyword in name for keyword in notBlocks)
-
-def get_block_list():
-    response = requests.get(texture_url)
-    response.raise_for_status()
-
-    texture_data = response.json()
-
-    block_list = []
-
-    for filename in texture_data["files"]:
-        if not filename.endswith(".png"):
-            continue
-
-        name = filename[:-4]
-
-        if should_exclude(name):
-            continue
-
-        block_list.append(name)
-
-    return block_list
-
-def map_textures_to_ids():
-    response = requests.get(models_url)
-    response.raise_for_status()
-    
-    models_data = response.json()
-
-    # 提取所有材質名稱
-    all_textures = get_block_list()
-
-    # 準備儲存容器
-    texture_to_ids = {tex: [] for tex in all_textures}
-
-    # 2. 遍歷所有模型 ID，找出它們使用的材質
-    for model_id, model_content in models_data.items():
-        textures_dict = model_content.get("textures", {})
-
-        for tex_path in textures_dict.values():
-            # 材質路徑通常是 "minecraft:block/acacia_planks"
-            # 我們需要提取最後的名字
-            if "/" in tex_path:
-                tex_name = tex_path.split("/")[-1]
-            else:
-                tex_name = tex_path.replace("minecraft:", "")
-
-            # 如果這個材質在我們的材質列表中，建立關聯
-            if tex_name in texture_to_ids:
-                if model_id not in texture_to_ids[tex_name]:
-                    texture_to_ids[tex_name].append(model_id)
-
-    # 3. 分析統計資訊
-    ids_detail = {
-        tex: ids
-        for tex, ids in texture_to_ids.items()
-    }
-
-    return ids_detail
-
-def process_texture_ids(texture_map):
-    """
-    texture_map: map_textures_to_ids() 的返回值
-    返回 list of dict，每個 dict 包含 name 和 id
-    """
-    result = []
-
-    for name, ids_list in texture_map.items():
-        # 判斷 value 中是否有和 key 完全相同
-        if name in ids_list:
-            final_id = name
-        else:
-            # 去掉最後一段文字，例如 "acacia_log_top" -> "acacia_log"
-            parts = name.split("_")
-            final_id = "_".join(parts[:-1])
-
-        result.append({
-            "name": name,
-            "id": final_id
-        })
-
-    return result
+def fetch_json(url, description="resource"):
+    """Fetches and parses JSON from a remote URL with error handling."""
+    try:
+        response = requests.get(url, timeout=15)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching {description}: {e}")
+        return None
 
 def calculate_avg_rgb_lab_from_img(img_obj):
     """
-    從單張 Image 計算加權平均 Lab 與 RGB
-    返回：
-        rgb_list: [R, G, B] 0-255
-        lab_list: [L, a, b]
-        total_count: 像素總數
+    Calculates weighted average Lab and RGB from a PIL Image object.
+    Uses LCH space for better hue averaging.
     """
     L_sum, C_sum, h_x, h_y, total_count = 0, 0, 0, 0, 0
     img_rgba = img_obj.convert('RGBA')
 
     for px in img_rgba.getdata():
-        if px[3] != 0:  # 透明像素忽略
+        if px[3] != 0:  # Ignore transparent pixels
             rgb = sRGBColor(px[0]/255, px[1]/255, px[2]/255)
             lab = convert_color(rgb, LabColor)
             lch = convert_color(lab, LCHabColor)
@@ -283,15 +201,12 @@ def calculate_avg_rgb_lab_from_img(img_obj):
     if total_count == 0:
         return None, None, 0
 
-    # 計算平均 LCH
     L_avg, C_avg = L_sum / total_count, C_sum / total_count
     h_avg = math.degrees(math.atan2(h_y, h_x)) % 360
 
-    # 轉回 Lab
     avg_lab_obj = convert_color(LCHabColor(L_avg, C_avg, h_avg), LabColor)
     lab_list = [avg_lab_obj.lab_l, avg_lab_obj.lab_a, avg_lab_obj.lab_b]
 
-    # Lab -> RGB
     avg_rgb_obj = convert_color(avg_lab_obj, sRGBColor)
     rgb_list = [
         max(0, min(255, round(avg_rgb_obj.rgb_r * 255))),
@@ -301,14 +216,9 @@ def calculate_avg_rgb_lab_from_img(img_obj):
 
     return rgb_list, lab_list, total_count
 
-
 def calculate_avg_rgb_lab_from_textures(texture_paths):
     """
-    從多張貼圖計算加權平均 Lab 與 RGB
-    返回：
-        final_rgb: [R, G, B]
-        final_lab: [L, a, b]
-        total_px: 總像素數
+    Computes a weighted average color from multiple texture files.
     """
     if not texture_paths:
         return None, None, 0
@@ -329,11 +239,9 @@ def calculate_avg_rgb_lab_from_textures(texture_paths):
     if total_px == 0:
         return None, None, 0
 
-    # 加權平均 Lab
     final_lab = [total_L / total_px, total_a / total_px, total_b / total_px]
     lab_obj = LabColor(*final_lab)
 
-    # Lab -> RGB
     rgb_obj = convert_color(lab_obj, sRGBColor)
     final_rgb = [
         max(0, min(255, round(rgb_obj.rgb_r * 255))),
@@ -343,52 +251,95 @@ def calculate_avg_rgb_lab_from_textures(texture_paths):
 
     return final_rgb, final_lab, total_px
 
-def calculate_block_colors(block_list, dirname):
-    """
-    block_list: 從 get_block_list() 拿到的 block 名稱 list
-    dirname: 本地圖片資料夾，例如 'minecraft-assets-1.20/assets/minecraft/textures/block'
-    
-    返回 dict: {block_name: {"rgb": [...], "lab": [...], "pixels": N}}
-    """
-    result = {}
+# ============================================================
+# BLOCK DATA PROCESSING
+# ============================================================
 
-    for block_name in block_list:
-        # 嘗試找對應的 png
-        png_path = os.path.join(dirname, f"{block_name}.png")
-        if not os.path.exists(png_path):
-            # 如果檔案不存在就跳過
+def get_block_list(texture_data):
+    """
+    Fetches the list of block texture filenames and filters them based on exclusion rules.
+    """
+    notBlocks = excludeBlocks + [kw for group in tagKeywords.values() for kw in group]
+    block_list = []
+
+    for filename in texture_data["files"]:
+        if not filename.endswith(".png"):
             continue
 
-        img = Image.open(png_path)
-        rgb, lab, count = calculate_avg_rgb_lab_from_img(img)
-        if count == 0:
+        name = filename[:-4]
+
+        if any(exc in name for exc in absoluteBlock):
+            block_list.append(name)
+            continue
+            
+        if ("coral" in name and "block" not in name):
+            continue
+            
+        if any(keyword in name for keyword in notBlocks):
             continue
 
-        result[block_name] = {
-            "rgb": rgb,
-            "lab": lab,
-        }
+        block_list.append(name)
+
+    return block_list
+
+def map_textures_to_ids(all_textures, models_data):
+    """
+    Maps texture filenames to Minecraft block IDs using model data.
+    """
+    texture_to_ids = {tex: [] for tex in all_textures}
+
+    # 遍歷所有模型 ID，找出它們使用的材質
+    for model_id, model_content in models_data.items():
+        textures_dict = model_content.get("textures", {})
+
+        for tex_path in textures_dict.values():
+            # 提取 "minecraft:block/" 之後的名字
+            if "/" in tex_path:
+                tex_name = tex_path.split("/")[-1]
+            else:
+                tex_name = tex_path.replace("minecraft:", "")
+
+            # 如果這個材質在我們的材質列表中，建立關聯
+            if tex_name in texture_to_ids:
+                if model_id not in texture_to_ids[tex_name]:
+                    texture_to_ids[tex_name].append(model_id)
+
+    return texture_to_ids
+
+def process_texture_ids(texture_map):
+    """
+    Matches texture names with the most likely Block ID.
+    """
+    result = []
+
+    for name, ids_list in texture_map.items():
+        # 判斷 value 中是否有和 key 完全相同
+        if name in ids_list:
+            final_id = name
+        else:
+            # 去掉最後一段文字，例如 "acacia_log_top" -> "acacia_log"
+            parts = name.split("_")
+            final_id = "_".join(parts[:-1])
+
+        result.append({
+            "name": name,
+            "id": final_id
+        })
 
     return result
 
+# ============================================================
+# DECORATION DATA PROCESSING
+# ============================================================
 
-""" decorations """
-# creat decorations list
-def get_decoration_list(block_list):
+def get_decoration_list(block_list, blockstates_data):
     """
-    block_list: 已經取得的基礎方塊名稱清單 (例如來自 get_block_list())
-    回傳：在 blockstates 中但不在 block_list 中的裝飾性方塊清單
+    Identifies 'decoration' blocks from blockstates that aren't in the main block list.
     """
-    response = requests.get(blockstates_url)
-    response.raise_for_status()
-    
-    # 根據資料結構，這通常是一個包含 "files" 欄位的 dict
-    decoration_data = response.json()
-    
     # 提取檔名並去掉 .json 後綴
     all_states = []
-    if "files" in decoration_data:
-        for filename in decoration_data["files"]:
+    if "files" in blockstates_data:
+        for filename in blockstates_data["files"]:
             if filename == "fire.json" or filename == "light.json":
                 continue
             if filename.endswith(".json"):
@@ -402,14 +353,15 @@ def get_decoration_list(block_list):
             filtered_states.append(state)
     
     # 扣除 block_list 中已有的項目
-    # 注意：block_list 傳入的是 get_block_list() 的純名稱 list
     notDecorations = block_list + absoluteBlock
     decoration_set = set(filtered_states) - set(notDecorations)
     
     return sorted(list(decoration_set))
 
-# find decoration image
 def map_names_to_textures(decoration_list, models_data):
+    """
+    Finds associated texture paths for decoration items.
+    """
     result = {}
     color_prefixes = list(specific_color.keys())
     
@@ -436,19 +388,14 @@ def map_names_to_textures(decoration_list, models_data):
 
     return result
 
-# Compare blockstates and textures
-def process_decoration_texture(mapped_textures, dirname, specific_color):
+def process_decoration_texture(mapped_textures, asset_dir, specific_color):
     """
-    mapped_textures: map_names_to_textures 的結果, {name: [texture1, texture2, ...]}
-    dirname: 本地圖片資料夾
-    specific_color: 特例顏色字典 {color: hex}
-
-    返回 dict: {name: {"rgb": [...], "lab": [...]}}
+    Calculates colors for decorations, handling special cases like Beds/Banners.
     """
     result = {}
 
     for name, textures in mapped_textures.items():
-        # 1️⃣ 特例顏色處理
+        # Handle Predefined Colors
         handled = False
         for color in specific_color.keys():
             if name.startswith(f"{color}_bed") or name.startswith(f"{color}_banner"):
@@ -481,7 +428,7 @@ def process_decoration_texture(mapped_textures, dirname, specific_color):
         existing_paths = []
         for t in textures:
             clean_name = t.split("/")[-1] if "/" in t else t
-            p = os.path.join(dirname, f"{clean_name}.png")
+            p = os.path.join(asset_dir, f"{clean_name}.png")
             if os.path.exists(p): existing_paths.append(p)
 
         if not existing_paths:
@@ -514,13 +461,12 @@ def get_decoration_tag(blockName):
     return tags if tags else ["decoration"]
 
 # find image
-wiki_cache = {}
 def get_decoration_image(decoration_list):
     """
-    decoration_list: get_decoration_list() 取得的裝飾方塊名稱清單
-    返回 dict: {block_name: wiki_image_url}
+    Scrapes the Minecraft Wiki API for high-quality item renders.
+    Implements complex filtering to get the correct orientation.
     """
-    WIKI_API_URL = "https://minecraft.wiki/api.php"
+    
     result = {}
 
     for b_id in decoration_list:
@@ -565,9 +511,7 @@ def get_decoration_image(decoration_list):
                 if "mushroom" in b_id and "block" not in b_id:
                     if "Block" in name: continue
                 if b_id == "smithing_table" and "Hammer" in name: continue
-                if "vines" in b_id:
-                    if "plant" not in b_id and "Plant" in name: continue
-                    if "plant" in b_id and "Plant" not in name: continue
+                if "vines" in b_id and "Plant" not in name: continue
                 if '(' in name and ')' in name:
                     c = re.search(r'\((.*?)\)', name)
                     if c and (re.search(r'[^EWNSUD0-9_]', c.group(1)) or c.group(1)==""): continue
@@ -609,24 +553,23 @@ def get_decoration_image(decoration_list):
 
     return result
 
+# ============================================================
+# INDEPENDENT PROCESSORS
+# ============================================================
 
-""" main program """
-def main():
-    # 1. Blocks Processing
-    texture_map = map_textures_to_ids()
-    block_info_list = process_texture_ids(texture_map)
-    block_results = []
-    
-    print(f"處理 Blocks 項目...")
+def process_blocks(block_info_list, version, asset_dir):
+    """Processes standard blocks: calculates color and generates GitHub texture URLs."""
+    results = []
     for item in block_info_list:
         name, b_id = item["name"], item["id"]
-        img_path = os.path.join(dirname, f"{name}.png")
-        if not os.path.exists(img_path): continue
+        img_path = os.path.join(asset_dir, f"{name}.png")
+        if not os.path.exists(img_path): 
+            continue
         try:
             with Image.open(img_path) as img:
                 rgb, lab, count = calculate_avg_rgb_lab_from_img(img)
                 if count > 0 and rgb:
-                    block_results.append({
+                    results.append({
                         "name": name,
                         "id": b_id,
                         "rgb": rgb,
@@ -634,25 +577,23 @@ def main():
                         "tags": ["block"],
                         "image": f"https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/{version}/assets/minecraft/textures/block/{name}.png"
                     })
-        except Exception as e: print(f"Error {name}: {e}")
-
-    # 2. Decorations Processing
-    print(f"處理 Decorations 項目...")
-    base_block_names = [b["name"] for b in block_results]
-    decoration_names = get_decoration_list(base_block_names)
-
-    # Get Models Data
-    models_res = requests.get(models_url)
-    models_data = models_res.json()
+        except Exception as e: 
+            print(f"Error processing block {name}: {e}")
+    return results
     
+def process_decorations(decoration_names, models_data, asset_dir):
+    """Processes decorations: links models, calculates colors, and fetches Wiki renders."""
+    # 獲取模型對應的材質路徑
     mapped_tex = map_names_to_textures(decoration_names, models_data)
-    color_data = process_decoration_texture(mapped_tex, dirname, specific_color)
+    # 計算平均顏色（處理特殊顏色如床、旗幟）
+    color_data = process_decoration_texture(mapped_tex, asset_dir, specific_color)
+    # 抓取 Wiki 圖片連結
     image_data = get_decoration_image(decoration_names)
     
-    decoration_results = []
+    results = []
     for name in decoration_names:
         if name in color_data and color_data[name]["rgb"]:
-            decoration_results.append({
+            results.append({
                 "name": name,
                 "id": name,
                 "rgb": color_data[name]["rgb"],
@@ -660,8 +601,47 @@ def main():
                 "tags": get_decoration_tag(name),
                 "image": image_data.get(name)
             })
+    return results
 
-    # Final Output
+# ============================================================
+# MAIN EXECUTION
+# ============================================================
+
+def main():
+    print('Block data converter\n')
+    
+    # Step 0: Download and Unzip Assets (if not exists)
+    if not os.path.exists(asset_file):
+        print(f"Downloading assets for {version}...")
+        os.system(f"wget {asset_url} -O {asset_file}")
+        os.system(f"unzip -q {asset_file}")
+    
+    # Step 1: Load JSON manifests from GitHub
+    print("Fetching remote resource manifests...")
+    resources = {
+        "textures": fetch_json(texture_url, "texture list"),
+        "models": fetch_json(models_url, "models data"),
+        "blockstates": fetch_json(blockstates_url, "blockstates list")
+    }
+    
+    if not all(resources.values()):
+        print("Error: Could not load all required remote resources. Exiting.")
+        return
+    
+    # Step 2: Process Standard Blocks
+    print(f"Processing Blocks...")
+    all_textures_list = get_block_list(resources["textures"])
+    texture_map = map_textures_to_ids(all_textures_list, resources["models"])
+    block_info_list = process_texture_ids(texture_map)
+    block_results = process_blocks(block_info_list, version, asset_dir)
+    
+    # Step 3: Process Decorations
+    print(f"Processing Decorations...")
+    base_block_names = [b["name"] for b in block_results]
+    decoration_names = get_decoration_list(base_block_names, resources["blockstates"])
+    decoration_results = process_decorations(decoration_names, resources["models"], asset_dir)
+
+    # Step 4: Save final result to JSON
     output = {
         "meta": {"minecraftVersion": version},
         "blocks": block_results,
@@ -671,8 +651,8 @@ def main():
     with open(outputFile, 'w', encoding='utf-8') as f:
         json.dump(output, f, indent=4, ensure_ascii=False)
     
-    print(f"\n處理完成！Blocks: {len(block_results)}, Decorations: {len(decoration_results)}")
-    print(f"檔案已儲存至: {outputFile}")
+    print(f"\nProcessing Complete! Blocks: {len(block_results)}, Decorations: {len(decoration_results)}")
+    print(f"Data saved to:{outputFile}")
 
 if __name__ == "__main__":
     main()
