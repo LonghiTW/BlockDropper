@@ -58,7 +58,7 @@ excludeBlocks = [
 
 # Blocks that should always be Block
 absoluteBlock = [
-    "bedrock", "beehive", "mushroom_block", "suspicious_gravel", "suspicious_sand", "test",
+    "bedrock", "beehive", "mushroom_block", "suspicious_gravel", "suspicious_sand", "test_block",
 ]
 
 # Classification keywords for adding metadata tags to the output
