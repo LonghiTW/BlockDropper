@@ -8850,6 +8850,24 @@
             "image": "https://minecraft.wiki/images/Crafting_Table_JE4_BE3.png"
         },
         {
+            "name": "creeper_head",
+            "id": "creeper_head",
+            "rgb": [
+                73,
+                126,
+                75
+            ],
+            "lab": [
+                47.9775030565061,
+                -26.743998245393932,
+                22.025667885658827
+            ],
+            "tags": [
+                "decoration"
+            ],
+            "image": "https://minecraft.wiki/images/Creeper_Head_(S)_JE1.png"
+        },
+        {
             "name": "crimson_fence",
             "id": "crimson_fence",
             "rgb": [
@@ -9767,6 +9785,24 @@
                 "decoration"
             ],
             "image": "https://minecraft.wiki/images/Dragon_Egg_JE5.png"
+        },
+        {
+            "name": "dragon_head",
+            "id": "dragon_head",
+            "rgb": [
+                22,
+                22,
+                24
+            ],
+            "lab": [
+                7.440229060322141,
+                -0.042098632960888026,
+                -0.9927569082515066
+            ],
+            "tags": [
+                "decoration"
+            ],
+            "image": "https://minecraft.wiki/images/Dragon_Head_(S)_JE1.png"
         },
         {
             "name": "dried_ghast",
@@ -12935,6 +12971,24 @@
             "image": "https://minecraft.wiki/images/Peony_JE4_BE3.png"
         },
         {
+            "name": "piglin_head",
+            "id": "piglin_head",
+            "rgb": [
+                176,
+                128,
+                93
+            ],
+            "lab": [
+                57.85048494717084,
+                16.15296170112873,
+                26.756912130903807
+            ],
+            "tags": [
+                "decoration"
+            ],
+            "image": "https://minecraft.wiki/images/Piglin_Head_(S)_JE1.png"
+        },
+        {
             "name": "pink_banner",
             "id": "pink_banner",
             "rgb": [
@@ -13170,6 +13224,24 @@
             "image": "https://minecraft.wiki/images/Pitcher_Plant_JE1_BE1.png"
         },
         {
+            "name": "player_head",
+            "id": "player_head",
+            "rgb": [
+                55,
+                39,
+                24
+            ],
+            "lab": [
+                17.25965401215833,
+                5.823651896316019,
+                12.707665592548892
+            ],
+            "tags": [
+                "decoration"
+            ],
+            "image": "https://minecraft.wiki/images/Player_Head_(S)_JE2.png"
+        },
+        {
             "name": "podzol",
             "id": "podzol",
             "rgb": [
@@ -13186,6 +13258,24 @@
                 "decoration"
             ],
             "image": "https://minecraft.wiki/images/Podzol_JE2_BE2.png"
+        },
+        {
+            "name": "pointed_dripstone",
+            "id": "pointed_dripstone",
+            "rgb": [
+                129,
+                102,
+                89
+            ],
+            "lab": [
+                45.64707900444649,
+                9.64349724988515,
+                11.758155233177483
+            ],
+            "tags": [
+                "decoration"
+            ],
+            "image": "https://minecraft.wiki/images/Pointed_Dripstone_Tip_(D)_JE1_BE1.png"
         },
         {
             "name": "polished_basalt",
@@ -14233,6 +14323,24 @@
                 "decoration"
             ],
             "image": "https://minecraft.wiki/images/Smooth_Sandstone_JE7_BE2.png"
+        },
+        {
+            "name": "sniffer_egg",
+            "id": "sniffer_egg",
+            "rgb": [
+                102,
+                85,
+                13
+            ],
+            "lab": [
+                36.810682014507194,
+                1.5577715244205539,
+                40.39092500594376
+            ],
+            "tags": [
+                "decoration"
+            ],
+            "image": "https://minecraft.wiki/images/Sniffer_Egg_JE1_BE1.png"
         },
         {
             "name": "snow",
@@ -15587,6 +15695,24 @@
                 "translucent"
             ],
             "image": "https://minecraft.wiki/images/Yellow_Stained_Glass_Pane_(EW)_JE9.png"
+        },
+        {
+            "name": "zombie_head",
+            "id": "zombie_head",
+            "rgb": [
+                45,
+                78,
+                37
+            ],
+            "lab": [
+                29.648300570695696,
+                -19.20274659117181,
+                19.76573689748827
+            ],
+            "tags": [
+                "decoration"
+            ],
+            "image": "https://minecraft.wiki/images/Zombie_Head_(S)_JE2.png"
         }
     ]
 }
