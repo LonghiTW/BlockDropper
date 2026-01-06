@@ -205,16 +205,18 @@ def calculate_image_color_avg(image_object):
     img_rgba = image_object.convert('RGBA')
 
     for px in img_rgba.getdata():
-        if px[3] != 0:  # Ignore transparent pixels
+        if px[3] > 0:  # Ignore transparent pixels
+            weight = px[3] / 255.0 # Transparent weight
             rgb = sRGBColor(px[0]/255, px[1]/255, px[2]/255)
             lab = convert_color(rgb, LabColor)
             lch = convert_color(lab, LCHabColor)
-            L_sum += lch.lch_l
-            C_sum += lch.lch_c
+            
+            L_sum += lch.lch_l * weight
+            C_sum += lch.lch_c * weight
             h_rad = math.radians(lch.lch_h)
-            h_x += math.cos(h_rad)
-            h_y += math.sin(h_rad)
-            total_count += 1
+            h_x += math.cos(h_rad) * weight
+            h_y += math.sin(h_rad) * weight
+            total_count += weight
 
     if total_count == 0:
         return None, None, 0
