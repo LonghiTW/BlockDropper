@@ -170,7 +170,7 @@ PREDEFINED_COLORS = {
     "lime": "#80C71F",
     "pink": "#F38BAA",
     "gray": "#474F52",
-    "light_gray": " #9D9D97",
+    "light_gray": "#9D9D97",
     "cyan": "#169C9C",
     "purple": "#8932B8",
     "blue": "#3C44AA",
