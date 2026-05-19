@@ -4,8 +4,8 @@
     },
     "blocks": [
         {
-            "name": "acacia_log",
-            "id": "acacia_log",
+            "name": "acacia_wood",
+            "id": "acacia_wood",
             "rgb": [
                 102,
                 97,
@@ -200,24 +200,6 @@
                 "block"
             ],
             "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/bamboo_planks.png"
-        },
-        {
-            "name": "bamboo_stalk",
-            "id": "bamboo",
-            "rgb": [
-                84,
-                145,
-                20
-            ],
-            "lab": [
-                54.424723595193655,
-                -35.128668171557784,
-                52.55140977671707
-            ],
-            "tags": [
-                "block"
-            ],
-            "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/bamboo_stalk.png"
         },
         {
             "name": "barrel_bottom",
@@ -418,8 +400,8 @@
             "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/beehive_side.png"
         },
         {
-            "name": "birch_log",
-            "id": "birch_log",
+            "name": "birch_wood",
+            "id": "birch_wood",
             "rgb": [
                 215,
                 213,
@@ -940,26 +922,8 @@
             "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/calcite.png"
         },
         {
-            "name": "carved_pumpkin",
-            "id": "carved_pumpkin",
-            "rgb": [
-                149,
-                78,
-                25
-            ],
-            "lab": [
-                41.68409899575675,
-                27.701203700529504,
-                42.91193206937487
-            ],
-            "tags": [
-                "block"
-            ],
-            "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/carved_pumpkin.png"
-        },
-        {
-            "name": "cherry_log",
-            "id": "cherry_log",
+            "name": "cherry_wood",
+            "id": "cherry_wood",
             "rgb": [
                 55,
                 33,
@@ -1732,8 +1696,8 @@
             "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/crimson_planks.png"
         },
         {
-            "name": "crimson_stem",
-            "id": "crimson_stem",
+            "name": "crimson_hyphae",
+            "id": "crimson_hyphae",
             "rgb": [
                 96,
                 24,
@@ -1912,8 +1876,8 @@
             "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/cyan_wool.png"
         },
         {
-            "name": "dark_oak_log",
-            "id": "dark_oak_log",
+            "name": "dark_oak_wood",
+            "id": "dark_oak_wood",
             "rgb": [
                 58,
                 47,
@@ -2920,8 +2884,8 @@
             "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/iron_block.png"
         },
         {
-            "name": "jungle_log",
-            "id": "jungle_log",
+            "name": "jungle_wood",
+            "id": "jungle_wood",
             "rgb": [
                 82,
                 68,
@@ -3262,78 +3226,6 @@
             "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/lodestone_top.png"
         },
         {
-            "name": "loom_bottom",
-            "id": "loom",
-            "rgb": [
-                74,
-                60,
-                36
-            ],
-            "lab": [
-                26.341533858654454,
-                3.424103385263561,
-                17.37941055518874
-            ],
-            "tags": [
-                "block"
-            ],
-            "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/loom_bottom.png"
-        },
-        {
-            "name": "loom_front",
-            "id": "loom",
-            "rgb": [
-                147,
-                117,
-                81
-            ],
-            "lab": [
-                51.53053590434433,
-                8.234831494563833,
-                24.25866141474025
-            ],
-            "tags": [
-                "block"
-            ],
-            "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/loom_front.png"
-        },
-        {
-            "name": "loom_side",
-            "id": "loom",
-            "rgb": [
-                146,
-                99,
-                71
-            ],
-            "lab": [
-                46.658808866567995,
-                16.781269387600787,
-                23.79019980052113
-            ],
-            "tags": [
-                "block"
-            ],
-            "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/loom_side.png"
-        },
-        {
-            "name": "loom_top",
-            "id": "loom",
-            "rgb": [
-                141,
-                117,
-                90
-            ],
-            "lab": [
-                50.89205207751317,
-                6.720324335897586,
-                18.323683239118008
-            ],
-            "tags": [
-                "block"
-            ],
-            "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/loom_top.png"
-        },
-        {
             "name": "magenta_concrete",
             "id": "magenta_concrete",
             "rgb": [
@@ -3406,8 +3298,8 @@
             "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/magenta_wool.png"
         },
         {
-            "name": "mangrove_log",
-            "id": "mangrove_log",
+            "name": "mangrove_wood",
+            "id": "mangrove_wood",
             "rgb": [
                 81,
                 67,
@@ -3458,42 +3350,6 @@
                 "block"
             ],
             "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/mangrove_planks.png"
-        },
-        {
-            "name": "melon_side",
-            "id": "melon",
-            "rgb": [
-                105,
-                148,
-                25
-            ],
-            "lab": [
-                56.4583089565821,
-                -28.369250990394477,
-                53.47317047087621
-            ],
-            "tags": [
-                "block"
-            ],
-            "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/melon_side.png"
-        },
-        {
-            "name": "melon_top",
-            "id": "melon",
-            "rgb": [
-                102,
-                146,
-                26
-            ],
-            "lab": [
-                55.761409123470735,
-                -28.83428055116825,
-                52.59729469473507
-            ],
-            "tags": [
-                "block"
-            ],
-            "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/melon_top.png"
         },
         {
             "name": "moss_block",
@@ -3748,8 +3604,8 @@
             "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/note_block.png"
         },
         {
-            "name": "oak_log",
-            "id": "oak_log",
+            "name": "oak_wood",
+            "id": "oak_wood",
             "rgb": [
                 106,
                 85,
@@ -4072,8 +3928,8 @@
             "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/pale_moss_block.png"
         },
         {
-            "name": "pale_oak_log",
-            "id": "pale_oak_log",
+            "name": "pale_oak_wood",
+            "id": "pale_oak_wood",
             "rgb": [
                 87,
                 77,
@@ -4522,42 +4378,6 @@
             "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/prismarine_bricks.png"
         },
         {
-            "name": "pumpkin_side",
-            "id": "pumpkin",
-            "rgb": [
-                190,
-                115,
-                24
-            ],
-            "lab": [
-                55.885087435824474,
-                26.183728283033755,
-                57.52404479451079
-            ],
-            "tags": [
-                "block"
-            ],
-            "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/pumpkin_side.png"
-        },
-        {
-            "name": "pumpkin_top",
-            "id": "pumpkin",
-            "rgb": [
-                193,
-                119,
-                24
-            ],
-            "lab": [
-                57.1971057336921,
-                24.942245871386298,
-                58.642624136134444
-            ],
-            "tags": [
-                "block"
-            ],
-            "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/pumpkin_top.png"
-        },
-        {
             "name": "purple_concrete",
             "id": "purple_concrete",
             "rgb": [
@@ -4684,8 +4504,8 @@
             "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/purpur_pillar_top.png"
         },
         {
-            "name": "quartz_block_bottom",
-            "id": "quartz_block",
+            "name": "smooth_quartz",
+            "id": "smooth_quartz",
             "rgb": [
                 236,
                 230,
@@ -5080,60 +4900,6 @@
             "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/redstone_lamp_on.png"
         },
         {
-            "name": "reinforced_deepslate_bottom",
-            "id": "reinforced_deepslate",
-            "rgb": [
-                79,
-                81,
-                87
-            ],
-            "lab": [
-                34.28095673349623,
-                0.2538871154534758,
-                -3.906238304732911
-            ],
-            "tags": [
-                "block"
-            ],
-            "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/reinforced_deepslate_bottom.png"
-        },
-        {
-            "name": "reinforced_deepslate_side",
-            "id": "reinforced_deepslate",
-            "rgb": [
-                96,
-                107,
-                118
-            ],
-            "lab": [
-                44.58414259852241,
-                -2.4900722520454,
-                -7.544399592668029
-            ],
-            "tags": [
-                "block"
-            ],
-            "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/reinforced_deepslate_side.png"
-        },
-        {
-            "name": "reinforced_deepslate_top",
-            "id": "reinforced_deepslate",
-            "rgb": [
-                79,
-                81,
-                86
-            ],
-            "lab": [
-                34.3082006054175,
-                0.2550940537922823,
-                -3.361249685165978
-            ],
-            "tags": [
-                "block"
-            ],
-            "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/reinforced_deepslate_top.png"
-        },
-        {
             "name": "resin_block",
             "id": "resin_block",
             "rgb": [
@@ -5296,96 +5062,6 @@
             "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/shroomlight.png"
         },
         {
-            "name": "smoker_bottom",
-            "id": "smoker",
-            "rgb": [
-                106,
-                105,
-                108
-            ],
-            "lab": [
-                44.566841961959746,
-                0.8806455217986091,
-                -1.373643800277147
-            ],
-            "tags": [
-                "block"
-            ],
-            "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/smoker_bottom.png"
-        },
-        {
-            "name": "smoker_front",
-            "id": "smoker",
-            "rgb": [
-                91,
-                72,
-                59
-            ],
-            "lab": [
-                32.311310743721805,
-                6.735728517187241,
-                10.754611494133075
-            ],
-            "tags": [
-                "block"
-            ],
-            "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/smoker_front.png"
-        },
-        {
-            "name": "smoker_front_on",
-            "id": "smoker_front",
-            "rgb": [
-                123,
-                94,
-                71
-            ],
-            "lab": [
-                42.33228906237666,
-                10.015991998751549,
-                17.671072842712576
-            ],
-            "tags": [
-                "block"
-            ],
-            "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/smoker_front_on.png"
-        },
-        {
-            "name": "smoker_side",
-            "id": "smoker",
-            "rgb": [
-                110,
-                88,
-                82
-            ],
-            "lab": [
-                39.40247636724576,
-                8.8628989524908,
-                6.996309228835521
-            ],
-            "tags": [
-                "block"
-            ],
-            "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/smoker_side.png"
-        },
-        {
-            "name": "smoker_top",
-            "id": "smoker",
-            "rgb": [
-                84,
-                82,
-                85
-            ],
-            "lab": [
-                35.156792964952984,
-                1.044861788833826,
-                -1.470585754625315
-            ],
-            "tags": [
-                "block"
-            ],
-            "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/smoker_top.png"
-        },
-        {
             "name": "smooth_basalt",
             "id": "smooth_basalt",
             "rgb": [
@@ -5476,8 +5152,8 @@
             "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/sponge.png"
         },
         {
-            "name": "spruce_log",
-            "id": "spruce_log",
+            "name": "spruce_wood",
+            "id": "spruce_wood",
             "rgb": [
                 57,
                 38,
@@ -5566,8 +5242,8 @@
             "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/stone_bricks.png"
         },
         {
-            "name": "stripped_acacia_log",
-            "id": "stripped_acacia_log",
+            "name": "stripped_acacia_wood",
+            "id": "stripped_acacia_wood",
             "rgb": [
                 171,
                 93,
@@ -5638,8 +5314,8 @@
             "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/stripped_bamboo_block_top.png"
         },
         {
-            "name": "stripped_birch_log",
-            "id": "stripped_birch_log",
+            "name": "stripped_birch_wood",
+            "id": "stripped_birch_wood",
             "rgb": [
                 192,
                 177,
@@ -5674,8 +5350,8 @@
             "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/stripped_birch_log_top.png"
         },
         {
-            "name": "stripped_cherry_log",
-            "id": "stripped_cherry_log",
+            "name": "stripped_cherry_wood",
+            "id": "stripped_cherry_wood",
             "rgb": [
                 213,
                 145,
@@ -5710,8 +5386,8 @@
             "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/stripped_cherry_log_top.png"
         },
         {
-            "name": "stripped_crimson_stem",
-            "id": "stripped_crimson_stem",
+            "name": "stripped_crimson_hyphae",
+            "id": "stripped_crimson_hyphae",
             "rgb": [
                 137,
                 56,
@@ -5746,8 +5422,8 @@
             "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/stripped_crimson_stem_top.png"
         },
         {
-            "name": "stripped_dark_oak_log",
-            "id": "stripped_dark_oak_log",
+            "name": "stripped_dark_oak_wood",
+            "id": "stripped_dark_oak_wood",
             "rgb": [
                 71,
                 57,
@@ -5782,8 +5458,8 @@
             "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/stripped_dark_oak_log_top.png"
         },
         {
-            "name": "stripped_jungle_log",
-            "id": "stripped_jungle_log",
+            "name": "stripped_jungle_wood",
+            "id": "stripped_jungle_wood",
             "rgb": [
                 168,
                 133,
@@ -5818,8 +5494,8 @@
             "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/stripped_jungle_log_top.png"
         },
         {
-            "name": "stripped_mangrove_log",
-            "id": "stripped_mangrove_log",
+            "name": "stripped_mangrove_wood",
+            "id": "stripped_mangrove_wood",
             "rgb": [
                 118,
                 54,
@@ -5854,8 +5530,8 @@
             "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/stripped_mangrove_log_top.png"
         },
         {
-            "name": "stripped_oak_log",
-            "id": "stripped_oak_log",
+            "name": "stripped_oak_wood",
+            "id": "stripped_oak_wood",
             "rgb": [
                 173,
                 145,
@@ -5890,8 +5566,8 @@
             "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/stripped_oak_log_top.png"
         },
         {
-            "name": "stripped_pale_oak_log",
-            "id": "stripped_pale_oak_log",
+            "name": "stripped_pale_oak_wood",
+            "id": "stripped_pale_oak_wood",
             "rgb": [
                 246,
                 238,
@@ -5926,8 +5602,8 @@
             "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/stripped_pale_oak_log_top.png"
         },
         {
-            "name": "stripped_spruce_log",
-            "id": "stripped_spruce_log",
+            "name": "stripped_spruce_wood",
+            "id": "stripped_spruce_wood",
             "rgb": [
                 112,
                 91,
@@ -5962,8 +5638,8 @@
             "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/stripped_spruce_log_top.png"
         },
         {
-            "name": "stripped_warped_stem",
-            "id": "stripped_warped_stem",
+            "name": "stripped_warped_hyphae",
+            "id": "stripped_warped_hyphae",
             "rgb": [
                 64,
                 151,
@@ -6196,8 +5872,8 @@
             "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/test_block_fail.png"
         },
         {
-            "name": "test_block_log",
-            "id": "test_block_log",
+            "name": "test_block_wood",
+            "id": "test_block_wood",
             "rgb": [
                 153,
                 174,
@@ -6376,8 +6052,8 @@
             "image": "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/26.1.2/assets/minecraft/textures/block/warped_planks.png"
         },
         {
-            "name": "warped_stem",
-            "id": "warped_stem",
+            "name": "warped_hyphae",
+            "id": "warped_hyphae",
             "rgb": [
                 83,
                 52,
@@ -6882,24 +6558,6 @@
             "image": "https://minecraft.wiki/images/Amethyst_Cluster_(U)_JE1_BE2.png"
         },
         {
-            "name": "ancient_debris",
-            "id": "ancient_debris",
-            "rgb": [
-                93,
-                64,
-                55
-            ],
-            "lab": [
-                30.37478119847748,
-                12.215759330500202,
-                10.858496753777926
-            ],
-            "tags": [
-                "decoration"
-            ],
-            "image": "https://minecraft.wiki/images/Ancient_Debris_JE1_BE1.png"
-        },
-        {
             "name": "andesite_wall",
             "id": "andesite_wall",
             "rgb": [
@@ -6934,42 +6592,6 @@
                 "decoration"
             ],
             "image": "https://minecraft.wiki/images/Anvil_(N)_JE3.png"
-        },
-        {
-            "name": "attached_melon_stem",
-            "id": "attached_melon_stem",
-            "rgb": [
-                147,
-                147,
-                147
-            ],
-            "lab": [
-                60.982568635080554,
-                -0.4354596602046487,
-                0.2968302254802478
-            ],
-            "tags": [
-                "decoration"
-            ],
-            "image": "https://minecraft.wiki/images/Attached_Melon_Stem_(W)_JE5.png"
-        },
-        {
-            "name": "attached_pumpkin_stem",
-            "id": "attached_pumpkin_stem",
-            "rgb": [
-                145,
-                146,
-                145
-            ],
-            "lab": [
-                60.512204939715446,
-                -0.4985242365258666,
-                0.2562584775594386
-            ],
-            "tags": [
-                "decoration"
-            ],
-            "image": "https://minecraft.wiki/images/Attached_Pumpkin_Stem_(W)_JE5.png"
         },
         {
             "name": "azalea",
@@ -7152,42 +6774,6 @@
                 "vertical"
             ],
             "image": "https://minecraft.wiki/images/Bamboo_Sign_(0)_JE1_BE1.png"
-        },
-        {
-            "name": "barrel",
-            "id": "barrel",
-            "rgb": [
-                116,
-                89,
-                52
-            ],
-            "lab": [
-                40.00001171718089,
-                7.919214886805555,
-                25.578290649393193
-            ],
-            "tags": [
-                "decoration"
-            ],
-            "image": "https://minecraft.wiki/images/Barrel_(U)_JE1_BE1.png"
-        },
-        {
-            "name": "basalt",
-            "id": "basalt",
-            "rgb": [
-                77,
-                76,
-                82
-            ],
-            "lab": [
-                32.69183083894565,
-                1.0175379843775467,
-                -3.389602860566553
-            ],
-            "tags": [
-                "decoration"
-            ],
-            "image": "https://minecraft.wiki/images/Basalt_(UD)_JE1_BE1.png"
         },
         {
             "name": "beacon",
@@ -7587,24 +7173,6 @@
             "image": "https://minecraft.wiki/images/Blackstone_Wall_(ewU)_JE3.png"
         },
         {
-            "name": "blast_furnace",
-            "id": "blast_furnace",
-            "rgb": [
-                98,
-                97,
-                98
-            ],
-            "lab": [
-                41.379254566966424,
-                0.4524675294393184,
-                -0.5497294525689238
-            ],
-            "tags": [
-                "decoration"
-            ],
-            "image": "https://minecraft.wiki/images/Blast_Furnace_(S)_JE1.png"
-        },
-        {
             "name": "blue_banner",
             "id": "blue_banner",
             "rgb": [
@@ -7766,24 +7334,6 @@
                 "translucent"
             ],
             "image": "https://minecraft.wiki/images/Blue_Stained_Glass_Pane_(EW)_JE10.png"
-        },
-        {
-            "name": "bone_block",
-            "id": "bone_block",
-            "rgb": [
-                217,
-                216,
-                193
-            ],
-            "lab": [
-                86.06571398725103,
-                -2.573277319020083,
-                11.550671851874654
-            ],
-            "tags": [
-                "decoration"
-            ],
-            "image": "https://minecraft.wiki/images/Bone_Block_(UD)_JE2_BE2.png"
         },
         {
             "name": "bookshelf",
@@ -8201,6 +7751,24 @@
             "image": "https://minecraft.wiki/images/Cartography_Table_JE3_BE2.png"
         },
         {
+            "name": "carved_pumpkin",
+            "id": "carved_pumpkin",
+            "rgb": [
+                177,
+                104,
+                25
+            ],
+            "lab": [
+                51.588764055091104,
+                26.27572595164985,
+                53.026200333340036
+            ],
+            "tags": [
+                "decoration"
+            ],
+            "image": "https://minecraft.wiki/images/Carved_Pumpkin_(S)_JE5.png"
+        },
+        {
             "name": "cauldron",
             "id": "cauldron",
             "rgb": [
@@ -8615,24 +8183,6 @@
             "image": "https://minecraft.wiki/images/Redstone_Comparator_(S)_JE5.png"
         },
         {
-            "name": "composter",
-            "id": "composter",
-            "rgb": [
-                117,
-                76,
-                35
-            ],
-            "lab": [
-                36.45829616578945,
-                15.13190291380915,
-                31.073210722911565
-            ],
-            "tags": [
-                "decoration"
-            ],
-            "image": "https://minecraft.wiki/images/Composter_JE1.png"
-        },
-        {
             "name": "conduit",
             "id": "conduit",
             "rgb": [
@@ -8938,24 +8488,6 @@
                 "vertical"
             ],
             "image": "https://minecraft.wiki/images/Crimson_Hanging_Sign_JE1_BE1.png"
-        },
-        {
-            "name": "crimson_hyphae",
-            "id": "crimson_hyphae",
-            "rgb": [
-                96,
-                24,
-                37
-            ],
-            "lab": [
-                21.493267905062986,
-                33.20203002340238,
-                10.9690364234958
-            ],
-            "tags": [
-                "decoration"
-            ],
-            "image": "https://minecraft.wiki/images/Crimson_Hyphae_(UD)_JE1_BE1.png"
         },
         {
             "name": "crimson_roots",
@@ -9733,24 +9265,6 @@
             "image": "https://minecraft.wiki/images/Diorite_Wall_(ewU)_JE3.png"
         },
         {
-            "name": "dirt_path",
-            "id": "dirt_path",
-            "rgb": [
-                137,
-                106,
-                66
-            ],
-            "lab": [
-                47.33552433724424,
-                8.663883689190756,
-                27.356811208286555
-            ],
-            "tags": [
-                "decoration"
-            ],
-            "image": "https://minecraft.wiki/images/Dirt_Path_JE4_BE3.png"
-        },
-        {
             "name": "dispenser",
             "id": "dispenser",
             "rgb": [
@@ -10241,24 +9755,6 @@
             "image": "https://minecraft.wiki/images/Frosted_Ice_JE2_BE2.png"
         },
         {
-            "name": "furnace",
-            "id": "furnace",
-            "rgb": [
-                106,
-                105,
-                106
-            ],
-            "lab": [
-                44.62708133937025,
-                0.10688328559951982,
-                -0.21887678986812173
-            ],
-            "tags": [
-                "decoration"
-            ],
-            "image": "https://minecraft.wiki/images/Furnace_(S)_JE4.png"
-        },
-        {
             "name": "glass",
             "id": "glass",
             "rgb": [
@@ -10710,24 +10206,6 @@
                 "decoration"
             ],
             "image": "https://minecraft.wiki/images/Hanging_Roots_JE2_BE2.png"
-        },
-        {
-            "name": "hay_block",
-            "id": "hay_block",
-            "rgb": [
-                161,
-                138,
-                22
-            ],
-            "lab": [
-                58.33377542232466,
-                0.5782076484639888,
-                58.01939206849119
-            ],
-            "tags": [
-                "decoration"
-            ],
-            "image": "https://minecraft.wiki/images/Hay_Bale_(UD)_JE2_BE2.png"
         },
         {
             "name": "heavy_core",
@@ -11689,24 +11167,6 @@
             "image": "https://minecraft.wiki/images/Lime_Stained_Glass_Pane_(EW)_JE9.png"
         },
         {
-            "name": "lodestone",
-            "id": "lodestone",
-            "rgb": [
-                133,
-                134,
-                137
-            ],
-            "lab": [
-                55.810937984544815,
-                0.032225376843725735,
-                -2.048231549227065
-            ],
-            "tags": [
-                "decoration"
-            ],
-            "image": "https://minecraft.wiki/images/Lodestone_JE1_BE1.png"
-        },
-        {
             "name": "loom",
             "id": "loom",
             "rgb": [
@@ -12174,24 +11634,6 @@
                 "decoration"
             ],
             "image": "https://minecraft.wiki/images/Muddy_Mangrove_Roots_JE1_BE1.png"
-        },
-        {
-            "name": "mycelium",
-            "id": "mycelium",
-            "rgb": [
-                120,
-                93,
-                81
-            ],
-            "lab": [
-                42.09199231076667,
-                10.209765202978213,
-                11.450847301216251
-            ],
-            "tags": [
-                "decoration"
-            ],
-            "image": "https://minecraft.wiki/images/Mycelium_JE3_BE3.png"
         },
         {
             "name": "nether_brick_fence",
@@ -13188,24 +12630,6 @@
             "image": "https://minecraft.wiki/images/Pink_Tulip_JE7_BE2.png"
         },
         {
-            "name": "piston",
-            "id": "piston",
-            "rgb": [
-                119,
-                108,
-                98
-            ],
-            "lab": [
-                46.493574283993574,
-                2.8733052767696425,
-                7.105948325637908
-            ],
-            "tags": [
-                "decoration"
-            ],
-            "image": "https://minecraft.wiki/images/Piston_(U)_JE4.png"
-        },
-        {
             "name": "piston_head",
             "id": "piston_head",
             "rgb": [
@@ -13260,24 +12684,6 @@
             "image": "https://minecraft.wiki/images/Player_Head_(S)_JE2.png"
         },
         {
-            "name": "podzol",
-            "id": "podzol",
-            "rgb": [
-                113,
-                82,
-                49
-            ],
-            "lab": [
-                37.713702572746335,
-                10.371825839460454,
-                24.769994747779652
-            ],
-            "tags": [
-                "decoration"
-            ],
-            "image": "https://minecraft.wiki/images/Podzol_JE2_BE2.png"
-        },
-        {
             "name": "pointed_dripstone",
             "id": "pointed_dripstone",
             "rgb": [
@@ -13294,24 +12700,6 @@
                 "decoration"
             ],
             "image": "https://minecraft.wiki/images/Pointed_Dripstone_Tip_(D)_JE1_BE1.png"
-        },
-        {
-            "name": "polished_basalt",
-            "id": "polished_basalt",
-            "rgb": [
-                93,
-                93,
-                96
-            ],
-            "lab": [
-                39.56132968603043,
-                0.3807371452112649,
-                -1.866146842438548
-            ],
-            "tags": [
-                "decoration"
-            ],
-            "image": "https://minecraft.wiki/images/Polished_Basalt_(UD)_JE1_BE1.png"
         },
         {
             "name": "polished_blackstone_brick_wall",
@@ -13619,24 +13007,6 @@
                 "translucent"
             ],
             "image": "https://minecraft.wiki/images/Purple_Stained_Glass_Pane_(EW)_JE9.png"
-        },
-        {
-            "name": "quartz_block",
-            "id": "quartz_block",
-            "rgb": [
-                235,
-                230,
-                223
-            ],
-            "lab": [
-                91.52946081544845,
-                1.0047619235321519,
-                4.100824634568321
-            ],
-            "tags": [
-                "decoration"
-            ],
-            "image": "https://minecraft.wiki/images/Block_of_Quartz_JE4_BE4.png"
         },
         {
             "name": "red_banner",
@@ -14289,24 +13659,6 @@
             "image": "https://minecraft.wiki/images/Smoker_(S)_JE2.png"
         },
         {
-            "name": "smooth_quartz",
-            "id": "smooth_quartz",
-            "rgb": [
-                236,
-                230,
-                224
-            ],
-            "lab": [
-                91.75516075549004,
-                1.0694226795803206,
-                3.916404822893119
-            ],
-            "tags": [
-                "decoration"
-            ],
-            "image": "https://minecraft.wiki/images/Smooth_Quartz_Block_JE3_BE2.png"
-        },
-        {
             "name": "smooth_red_sandstone",
             "id": "smooth_red_sandstone",
             "rgb": [
@@ -14647,42 +13999,6 @@
                 "decoration"
             ],
             "image": "https://minecraft.wiki/images/Stonecutter_JE2_BE1.png"
-        },
-        {
-            "name": "stripped_crimson_hyphae",
-            "id": "stripped_crimson_hyphae",
-            "rgb": [
-                137,
-                56,
-                90
-            ],
-            "lab": [
-                36.05429482746397,
-                37.69160054577767,
-                -2.5180786702419558
-            ],
-            "tags": [
-                "decoration"
-            ],
-            "image": "https://minecraft.wiki/images/Stripped_Crimson_Hyphae_(UD)_JE1_BE1.png"
-        },
-        {
-            "name": "stripped_warped_hyphae",
-            "id": "stripped_warped_hyphae",
-            "rgb": [
-                64,
-                151,
-                148
-            ],
-            "lab": [
-                57.18144688840638,
-                -27.869259174100968,
-                -6.519757055356058
-            ],
-            "tags": [
-                "decoration"
-            ],
-            "image": "https://minecraft.wiki/images/Stripped_Warped_Hyphae_(UD)_JE1_BE1.png"
         },
         {
             "name": "structure_block",
@@ -15135,24 +14451,6 @@
             "image": "https://minecraft.wiki/images/Warped_Hanging_Sign_JE1_BE1.png"
         },
         {
-            "name": "warped_hyphae",
-            "id": "warped_hyphae",
-            "rgb": [
-                83,
-                52,
-                90
-            ],
-            "lab": [
-                26.81094206540385,
-                19.380749013623067,
-                -17.19965336140582
-            ],
-            "tags": [
-                "decoration"
-            ],
-            "image": "https://minecraft.wiki/images/Warped_Hyphae_(UD)_JE1_BE1.png"
-        },
-        {
             "name": "warped_roots",
             "id": "warped_roots",
             "rgb": [
@@ -15368,7 +14666,7 @@
             "tags": [
                 "decoration"
             ],
-            "image": "https://minecraft.wiki/images/Wheat_JE2_BE2.png"
+            "image": "https://minecraft.wiki/images/Wheat_Age_7_JE10.png"
         },
         {
             "name": "white_banner",
