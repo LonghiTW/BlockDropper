@@ -9,9 +9,11 @@ import os
 import re
 import math
 import json
+import time
 import requests
 from PIL import Image
 from io import BytesIO
+from urllib.parse import unquote
 from colormath.color_objects import sRGBColor, LabColor, LCHabColor
 from colormath.color_conversions import convert_color
 
@@ -19,7 +21,7 @@ from colormath.color_conversions import convert_color
 # CONFIGURATION & CONSTANTS
 # ============================================================
 
-MINECRAFT_VERSION = "1.21.11"
+MINECRAFT_VERSION = "26.1.2"
 OUTPUT_FILE = 'block_data.json'
 # Path where the unzipped Minecraft assets are located
 ASSET_DIR = f'minecraft-assets-{MINECRAFT_VERSION}/assets/minecraft/textures/block'
@@ -38,7 +40,7 @@ WIKI_API_URL = "https://minecraft.wiki/api.php"
 # Keywords to exclude from the "standard block" processing
 EXCLUDED_BLOCK_KEYWORDS = [
     "_cake", "_honey", "_stage",
-    "active", "air", "anchor",
+    "active", "air", "anchor", "attached_",
     "barrier", "bubble", "button",
     "composter_compost", "composter_ready", "composter_top", "crop",
     "debug", "destroy", "door", "dust",
@@ -53,12 +55,12 @@ EXCLUDED_BLOCK_KEYWORDS = [
     "rail",
     "seagrass", "skeleton", "slab", "soul_fire", "stairs",
     "vines_plant", "void",
-    "wall_", "water", "waxed", "wire", "wood",
+    "wall_", "water", "waxed", "wire",
 ]
 
 # Blocks that should always be categorized as a "Block" regardless of name
 ALWAYS_BLOCK_LIST = [
-    "bedrock", "beehive", "mushroom_block", "snow_block", "suspicious_gravel", "suspicious_sand", "test_block",
+    "bedrock", "beehive", "mushroom_block", "quartz_block", "snow_block", "suspicious_gravel", "suspicious_sand", "test_block",
 ]
 
 # Classification keywords for adding metadata tags to the output items
@@ -70,7 +72,7 @@ TAG_CLASSIFICATION_KEYWORDS = {
         "fence",
         "pane",
         "rod",
-        "sign",
+        "sign", "stalk",
         "trapdoor",
         "vein",
         "wall"
@@ -104,12 +106,12 @@ TAG_CLASSIFICATION_KEYWORDS = {
         "ghast", "glazed", "golem", "grass", "grindstone",
         "hanging_moss", "head", "hopper",
         "jigsaw",
-        "ladder", "lantern", "leaf", "lectern", "lichen", "lilac", "lily",
-        "magma", "melon_stem",
+        "ladder", "lantern", "leaf", "lectern", "lichen", "lilac", "lily", "loom",
+        "magma", "melon",
         "observer", "orchid", "oxeye",
-        "peony", "petals", "pickle", "pitcher", "plant", "pointed", "poppy", "pot", "propagule", "pumpkin_stem",
-        "red_mushroom", "repeater", "roots", "rose",
-        "sapling", "scaffolding", "sensor", "shoot", "shrieker", "sprouts", "stand", "stonecutter", "structure",
+        "peony", "petals", "pickle", "pitcher", "plant", "pointed", "poppy", "pot", "propagule", "pumpkin",
+        "red_mushroom", "reinforced_deepslate", "repeater", "roots", "rose",
+        "sapling", "scaffolding", "sensor", "shoot", "shrieker", "smoker", "sprouts", "stand", "stonecutter", "structure",
         "table", "target", "tnt", "torch", "tripwire", "tulip",
         "vines",
         "wart_stage", "wheat"
@@ -119,8 +121,8 @@ TAG_CLASSIFICATION_KEYWORDS = {
 # Mapping for Wiki API redirects or specific names
 WIKI_PREFIX_MAPPING = {
     "bamboo_sapling": "Bamboo_Shoot",
+    "brewing_stand": "Brewing_Stand_(empty)",
     "command_block": "Impulse_Command_Block",
-    "quartz_block": "Block_of_Quartz",
     "chiseled_bookshelf": "Chiseled_Bookshelf_(S_0)",
     "comparator": "Redstone_Comparator",
     "deepslate_lapis_ore": "Deepslate_Lapis_Lazuli_Ore",
@@ -133,7 +135,17 @@ WIKI_PREFIX_MAPPING = {
     "scaffolding": "Standing_Scaffolding",
     "snow": "Snow_(layers_1)",
     "spawner": "Monster_Spawner",
-    "tnt": "TNT"
+    "tnt": "TNT",
+    "wheat": "Wheat_Age_7"
+}
+
+# Dictionary rules to map block names and IDs (e.g. mapping _log to _wood).
+# The key is the match pattern, and the value is the replacement text.
+BLOCK_REPLACEMENT_RULES = {
+    r"^(.*)_log$": r"\1_wood",
+    r"^(.*)crimson_stem$": r"\1crimson_hyphae",
+    r"^(.*)warped_stem$": r"\1warped_hyphae",
+    r"^(.*)quartz_block_bottom$": r"\1smooth_quartz",
 }
 
 # Direction tags for Wiki image filtering
@@ -302,6 +314,19 @@ def filter_valid_block_textures(texture_manifest):
 
     return block_list
 
+def extract_strings_from_structure(val):
+    """
+    Recursively extracts all string values from nested dictionaries or lists.
+    """
+    if isinstance(val, str):
+        yield val
+    elif isinstance(val, dict):
+        for v in val.values():
+            yield from extract_strings_from_structure(v)
+    elif isinstance(val, list):
+        for v in val:
+            yield from extract_strings_from_structure(v)
+
 def map_textures_to_model_ids(all_textures, models_manifest):
     """
     Maps texture filenames to Minecraft block IDs using model data.
@@ -312,17 +337,18 @@ def map_textures_to_model_ids(all_textures, models_manifest):
     for model_id, model_content in models_manifest.items():
         textures_dict = model_content.get("textures", {})
 
-        for tex_path in textures_dict.values():
-            # Extract name after "minecraft:block/"
-            if "/" in tex_path:
-                tex_name = tex_path.split("/")[-1]
-            else:
-                tex_name = tex_path.replace("minecraft:", "")
+        for tex_val in textures_dict.values():
+            for tex_path in extract_strings_from_structure(tex_val):
+                # Extract name after "minecraft:block/"
+                if "/" in tex_path:
+                    tex_name = tex_path.split("/")[-1]
+                else:
+                    tex_name = tex_path.replace("minecraft:", "")
 
-            # Link the model ID to the texture if it's in our valid list
-            if tex_name in texture_to_ids:
-                if model_id not in texture_to_ids[tex_name]:
-                    texture_to_ids[tex_name].append(model_id)
+                # Link the model ID to the texture if it's in our valid list
+                if tex_name in texture_to_ids:
+                    if model_id not in texture_to_ids[tex_name]:
+                        texture_to_ids[tex_name].append(model_id)
 
     return texture_to_ids
 
@@ -390,19 +416,25 @@ def find_decoration_texture_paths(decoration_list, models_manifest):
 
         # 1. Direct model match
         model = models_manifest.get(name)
-        if model and "textures" in model and any("block/" in str(v) for v in model["textures"].values()):
-            textures_set.update(model["textures"].values())
+        if model and "textures" in model:
+            for tex_val in model["textures"].values():
+                for tex_path in extract_strings_from_structure(tex_val):
+                    if "block/" in tex_path:
+                        textures_set.add(tex_path)
             
         # 2. Suffix-based fallback search
         if not textures_set:
             for suffix in SEARCH_SUFFIXES:
                 alt_name = f"{name}{suffix}"
                 model = models_manifest.get(alt_name)
-                # 同樣檢查後綴模型是否有真正的貼圖路徑
-                if model and "textures" in model and any("block/" in str(v) for v in model["textures"].values()):
-                    textures_set.update(model["textures"].values())
-                    print(f"  [Info] Resolved '{name}' using suffix: '{suffix}' (found '{alt_name}')")
-                    break
+                if model and "textures" in model:
+                    for tex_val in model["textures"].values():
+                        for tex_path in extract_strings_from_structure(tex_val):
+                            if "block/" in tex_path:
+                                textures_set.add(tex_path)
+                    if textures_set:
+                        print(f"  [Info] Resolved '{name}' using suffix: '{suffix}' (found '{alt_name}')")
+                        break
         
         # 3. Deep Resolve: search all models for any key containing the name that has a block path
         if not textures_set:
@@ -410,11 +442,12 @@ def find_decoration_texture_paths(decoration_list, models_manifest):
             
             for model_key, model_val in models_manifest.items():
                 if name in model_key and "textures" in model_val:
-                    vals = model_val["textures"].values()
-                    real_paths = [v for v in vals if "block/" in str(v)]
-                    if real_paths:
-                        textures_set.update(real_paths)
-                        print(f"  [Deep Resolve] '{name}' fixed using model '{model_key}' -> textures: {real_paths}")
+                    for tex_val in model_val["textures"].values():
+                        for tex_path in extract_strings_from_structure(tex_val):
+                            if "block/" in tex_path:
+                                textures_set.add(tex_path)
+                    if textures_set:
+                        print(f"  [Deep Resolve] '{name}' fixed using model '{model_key}' -> textures: {list(textures_set)}")
                         break
         
         # 4. Handle special cases like colored Beds or Banners
@@ -511,88 +544,194 @@ def generate_tags_for_block(block_name):
 def fetch_wiki_images_for_decorations(decoration_list):
     """
     Scrapes the Minecraft Wiki API for high-quality item renders.
-    Implements complex filtering to get the correct orientation.
+    Uses a hybrid approach:
+    1. Batch queries File:<Name>.png in chunks of 50 (super fast, low request count).
+    2. Falls back to sequential searches with list=allimages for any missing items.
     """
     result = {}
-
+    
+    # Map IDs to their expected Wiki file titles
+    id_to_title = {}
     for b_id in decoration_list:
-        # Check mapping for special names or use Title Case conversion
         if b_id in WIKI_PREFIX_MAPPING:
             api_prefix = WIKI_PREFIX_MAPPING[b_id]
         else:
             api_prefix = b_id.replace('_', ' ').title().replace(' ', '_')
-        if api_prefix in WIKI_IMAGE_CACHE:
-            final_wiki_url = WIKI_IMAGE_CACHE[api_prefix]
-            result[b_id] = final_wiki_url
-            continue
+            
+        # Add .png suffix if it doesn't have it
+        filename = api_prefix if api_prefix.endswith('.png') else f"{api_prefix}.png"
+        title = f"File:{filename}"
+        id_to_title[b_id] = title
 
+    # ----------------------------------------------------
+    # PHASE 1: Batch Resolve using prop=imageinfo (50 at a time)
+    # ----------------------------------------------------
+    print(f"  [Wiki] Batch resolving {len(decoration_list)} decoration image URLs...")
+    headers = {
+        "User-Agent": "BlockDropperDataConverter/2.0 (contact: github.com/LonghiTW/BlockDropper) requests/2.0"
+    }
+    
+    b_ids = list(decoration_list)
+    chunk_size = 50
+    missing_ids = []
+    
+    for i in range(0, len(b_ids), chunk_size):
+        chunk = b_ids[i:i+chunk_size]
+        titles = [id_to_title[b_id] for b_id in chunk]
+        
         params = {
             "action": "query",
-            "list": "allimages",
-            "aiprefix": api_prefix,
-            "ailimit": "max",
+            "titles": "|".join(titles),
+            "prop": "imageinfo",
+            "iiprop": "url",
             "format": "json"
         }
-
+        
         try:
-            response = requests.get(WIKI_API_URL, params=params, timeout=10)
+            # Respect rate limit slightly
+            time.sleep(0.3)
+            response = requests.get(WIKI_API_URL, params=params, headers=headers, timeout=10)
+            
+            if response.status_code == 429:
+                print("  [Wiki Warning] Rate limited (429) during batch. Backing off for 5 seconds...")
+                time.sleep(5)
+                response = requests.get(WIKI_API_URL, params=params, headers=headers, timeout=10)
+                
             if response.status_code != 200:
+                print(f"  [Wiki Error] Batch query returned status {response.status_code}")
+                missing_ids.extend(chunk)
+                continue
+                
+            pages = response.json().get("query", {}).get("pages", {})
+            for page_val in pages.values():
+                title = page_val.get("title")
+                # Normalize title spaces to match
+                normalized_title = title.replace(" ", "_") if title else None
+                
+                # Find matching b_id
+                b_id = None
+                for t, bid in id_to_title.items():
+                    if bid.replace(" ", "_") == normalized_title:
+                        b_id = t
+                        break
+                
+                if not b_id:
+                    continue
+                    
+                imageinfo = page_val.get("imageinfo", [])
+                if imageinfo and "missing" not in page_val:
+                    url = imageinfo[0].get("url")
+                    if url:
+                        url = url.split('?')[0]  # 去除 ?8f45e 等快取雜湊值，保持網址乾淨
+                    result[b_id] = unquote(url) if url else None
+                else:
+                    missing_ids.append(b_id)
+                    
+        except Exception as e:
+            print(f"  [Wiki Error] Exception in batch: {e}")
+            missing_ids.extend(chunk)
+
+    # ----------------------------------------------------
+    # PHASE 2: Sequential Fallback search for missing items
+    # ----------------------------------------------------
+    if missing_ids:
+        print(f"  [Wiki] Batch resolved {len(result)} / {len(decoration_list)} images.")
+        print(f"  [Wiki] Running sequential fallback searches for {len(missing_ids)} missing items...")
+        
+        for idx, b_id in enumerate(missing_ids):
+            # Check mapping for special names or use Title Case conversion
+            if b_id in WIKI_PREFIX_MAPPING:
+                api_prefix = WIKI_PREFIX_MAPPING[b_id]
+            else:
+                api_prefix = b_id.replace('_', ' ').title().replace(' ', '_')
+                
+            # If we already have it in cache, skip
+            if api_prefix in WIKI_IMAGE_CACHE:
+                result[b_id] = WIKI_IMAGE_CACHE[api_prefix]
                 continue
 
-            all_imgs = response.json().get('query', {}).get('allimages', [])
-            filtered = []
+            params = {
+                "action": "query",
+                "list": "allimages",
+                "aiprefix": api_prefix,
+                "ailimit": "max",
+                "format": "json"
+            }
 
-            for img in all_imgs:
-                name = img["name"]
-
-                if not name.endswith('.png'):
+            try:
+                # Politely delay between sequential queries
+                time.sleep(1.0)
+                
+                response = requests.get(WIKI_API_URL, params=params, headers=headers, timeout=10)
+                
+                if response.status_code == 429:
+                    print(f"  [Wiki Warning] Rate limited (429) during fallback for '{b_id}'. Backing off for 8 seconds...")
+                    time.sleep(8)
+                    response = requests.get(WIKI_API_URL, params=params, headers=headers, timeout=10)
+                    
+                if response.status_code != 200:
+                    print(f"  [Wiki Error] Sequential API returned status code {response.status_code} for '{b_id}'")
                     continue
-                if "pane" not in b_id and "Pane" in name: continue
-                if "bee" in b_id and "Honey" in name: continue
-                if "coral" in b_id and "block" not in b_id and "fan" not in b_id:
-                    if "Block" in name or "Fan" in name: continue
-                if "conduit" in b_id and "Power" in name: continue
-                if "mushroom" in b_id and "block" not in b_id:
-                    if "Block" in name: continue
-                if b_id == "smithing_table" and "Hammer" in name: continue
-                if "vines" in b_id and "Plant" not in name: continue
-                if '(' in name and ')' in name:
-                    c = re.search(r'\((.*?)\)', name)
-                    if "layers" not in c.group(1) and (re.search(r'[^EWNSUD0-9_]', c.group(1)) or c.group(1)==""):
+
+                all_imgs = response.json().get('query', {}).get('allimages', [])
+                filtered = []
+
+                for img in all_imgs:
+                    name = img["name"]
+
+                    if not name.endswith('.png'):
                         continue
-                filtered.append(img)
+                    if "pane" not in b_id and "Pane" in name: continue
+                    if "bee" in b_id and "Honey" in name: continue
+                    if "coral" in b_id and "block" not in b_id and "fan" not in b_id:
+                        if "Block" in name or "Fan" in name: continue
+                    if "conduit" in b_id and "Power" in name: continue
+                    if "mushroom" in b_id and "block" not in b_id:
+                        if "Block" in name: continue
+                    if b_id == "smithing_table" and "Hammer" in name: continue
+                    if "vines" in b_id and "Plant" not in name: continue
+                    if '(' in name and ')' in name:
+                        groups = re.findall(r'\((.*?)\)', name)
+                        should_continue = False
+                        for content in groups:
+                            api_prefix_clean = api_prefix.replace('_', ' ')
+                            if f"({content})" in api_prefix_clean:
+                                continue
+                            if "layers" not in content and (re.search(r'[^EWNSUD0-9_]', content) or content == ""):
+                                should_continue = True
+                                break
+                        if should_continue:
+                            continue
+                    filtered.append(img)
 
-            if filtered:
-                best_pick = None
-                max_je_ver = -1
+                if filtered:
+                    best_pick = None
+                    max_je_ver = -1
+                    
+                    forced_tag = next((t for t, kws in DIRECTION_TAG_MAP.items() if any(k in b_id for k in kws)), None)
+
+                    def get_priority(img):
+                        n = img["name"]
+                        is_match_forced = 0 if (forced_tag and forced_tag in n) else 1
+                        is_south = 0 if ("(S)" in n) else 1
+                        m = re.search(r'(?<![a-zA-Z])JE(\d+)', n)
+                        ver = int(m.group(1)) if m else 0
+                        return (is_match_forced, is_south, -ver, len(n))
+
+                    filtered.sort(key=get_priority)
+                    best_pick = filtered[0]["name"]
+                    
+                    final_wiki_url = f"https://minecraft.wiki/images/{best_pick.replace(' ', '_')}"
+                    decoded_wiki_url = unquote(final_wiki_url)
+                    WIKI_IMAGE_CACHE[api_prefix] = decoded_wiki_url
+                    result[b_id] = decoded_wiki_url
+                else:
+                    print(f"  [Wiki Warning] No matching .png files found for prefix: '{api_prefix}'")
+
+            except Exception as e:
+                print(f"  [Wiki Error] Exception during sequential query for '{b_id}': {e}")
+                result[b_id] = None
                 
-                # Rank results to find the best image
-                forced_tag = next((t for t, kws in DIRECTION_TAG_MAP.items() if any(k in b_id for k in kws)), None)
-
-                def get_priority(img):
-                    n = img["name"]
-                    # Priority Score (lower is better):
-                    # 1. Matches forced direction tag
-                    is_match_forced = 0 if (forced_tag and forced_tag in n) else 1
-                    # 2. Is standard (S) front view
-                    is_south = 0 if ("(S)" in n) else 1
-                    # 3. Java Edition version (highest version first)
-                    m = re.search(r'(?<![a-zA-Z])JE(\d+)', n)
-                    ver = int(m.group(1)) if m else 0
-                    # 4. Shortest filename as final tie-breaker
-                    return (is_match_forced, is_south, -ver, len(n))
-
-                filtered.sort(key=get_priority)
-                best_pick = filtered[0]["name"]
-                
-                final_wiki_url = f"https://minecraft.wiki/images/{best_pick.replace(' ', '_')}"
-                WIKI_IMAGE_CACHE[api_prefix] = final_wiki_url
-                result[b_id] = final_wiki_url
-
-        except Exception as e:
-            # 可選: 記錄錯誤
-            result[b_id] = None
-
     return result
 
 # ============================================================
@@ -602,6 +741,7 @@ def fetch_wiki_images_for_decorations(decoration_list):
 def process_standard_blocks(block_info_list, MINECRAFT_VERSION, ASSET_DIR):
     """
     Processes standard blocks: calculates color and generates GitHub texture URLs.
+    Supports dynamic replacement rules to alter output names and IDs.
     """
     results = []
     for item in block_info_list:
@@ -613,9 +753,19 @@ def process_standard_blocks(block_info_list, MINECRAFT_VERSION, ASSET_DIR):
             with Image.open(img_path) as img:
                 rgb, lab, count = calculate_image_color_avg(img)
                 if count > 0 and rgb:
+                    # Apply substitution rules
+                    final_name = name
+                    final_id = b_id
+                    
+                    for pattern, replacement in BLOCK_REPLACEMENT_RULES.items():
+                        if re.match(pattern, name):
+                            final_name = re.sub(pattern, replacement, name)
+                            final_id = final_name
+                            break
+
                     results.append({
-                        "name": name,
-                        "id": b_id,
+                        "name": final_name,
+                        "id": final_id,
                         "rgb": rgb,
                         "lab": lab,
                         "tags": ["block"],
@@ -684,7 +834,7 @@ def main():
     
     # Step 3: Process Decorations
     print(f"Processing Decorations...")
-    base_block_names = [b["name"] for b in block_results]
+    base_block_names = [b["id"] for b in block_results]
     decoration_names = identify_decoration_blocks(base_block_names, resources["blockstates"])
     decoration_results = process_decoration_items(decoration_names, resources["models"], ASSET_DIR)
 
@@ -699,7 +849,22 @@ def main():
         json.dump(output, f, indent=4, ensure_ascii=False)
     
     print(f"\nProcessing Complete! Blocks: {len(block_results)}, Decorations: {len(decoration_results)}")
-    print(f"Data saved to:{OUTPUT_FILE}")
+    
+    # Diagnostic summary
+    missing_block_imgs = [b["name"] for b in block_results if not b.get("image")]
+    missing_decor_imgs = [d["name"] for d in decoration_results if not d.get("image")]
+    
+    print(f"  - Blocks with valid image URLs: {len(block_results) - len(missing_block_imgs)} / {len(block_results)}")
+    print(f"  - Decorations with valid image URLs: {len(decoration_results) - len(missing_decor_imgs)} / {len(decoration_results)}")
+    
+    if missing_decor_imgs:
+        print(f"\n  [Notice] The following {len(missing_decor_imgs)} decorations failed to get a Wiki image URL:")
+        for name in missing_decor_imgs[:15]:
+            print(f"    - {name}")
+        if len(missing_decor_imgs) > 15:
+            print(f"    ... and {len(missing_decor_imgs) - 15} more.")
+            
+    print(f"\nData saved to: {OUTPUT_FILE}")
 
 if __name__ == "__main__":
     main()
