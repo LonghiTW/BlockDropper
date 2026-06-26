@@ -113,7 +113,7 @@ TAG_CLASSIFICATION_KEYWORDS = {
         "red_mushroom", "reinforced_deepslate", "repeater", "roots", "rose",
         "sapling", "scaffolding", "sensor", "shoot", "shrieker", "smoker", "sprouts", "stand", "stonecutter", "structure",
         "table", "target", "tnt", "torch", "tripwire", "tulip",
-        "vines",
+        "vine",
         "wart_stage", "wheat"
     ]
 }
@@ -136,6 +136,7 @@ WIKI_PREFIX_MAPPING = {
     "snow": "Snow_(layers_1)",
     "spawner": "Monster_Spawner",
     "tnt": "TNT",
+    "vine": "Vines",
     "wheat": "Wheat_Age_7"
 }
 
